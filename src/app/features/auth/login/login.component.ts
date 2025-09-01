@@ -73,19 +73,6 @@ import Swal from 'sweetalert2';
             </div>
           </form>
 
-          <div class="mt-6 pt-6 border-t border-gray-200">
-            <div class="grid grid-cols-1 gap-3">
-              <button type="button" (click)="loginAs('admin')" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                <span>👨‍💼 Admin</span>
-              </button>
-              <button type="button" (click)="loginAs('student')" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                <span>🎓 Estudiante</span>
-              </button>
-              <button type="button" (click)="loginAs('profesor')" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                <span>👨‍🏫 Profesor</span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -161,20 +148,4 @@ export class LoginComponent {
     });
   }
 
-  loginAs(role: 'admin' | 'student' | 'profesor') {
-    const credentials = {
-      admin: { email: 'admin@ibeltran.com.ar', password: 'AdminPassword2025!' },
-      // Usamos el primer profesor como ejemplo para el botón
-      profesor: { email: 'sebastian.saldivar@ibeltran.com.ar', password: 'ProfeSaldivar2025!' },
-      // El rol estudiante no tiene un usuario de prueba en el recurso 'users', lo quitamos por ahora
-      student: { email: 'alumno@ibeltran.com.ar', password: 'password' } // Este usuario no existe en la API de users
-    };
-
-    if (role !== 'student') {
-      this.loginForm.patchValue(credentials[role]);
-      this.onSubmit();
-    } else {
-      Swal.fire('Info', 'La funcionalidad de login para estudiantes no está implementada en este demo.', 'info');
-    }
-  }
 }
