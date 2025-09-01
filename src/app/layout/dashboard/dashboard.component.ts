@@ -55,7 +55,7 @@ import { CommonModule } from '@angular/common';
                 </a>
               </li>
               
-              <li *ngIf="currentUser?.role === 'admin' || currentUser?.role === 'teacher'">
+              <li *ngIf="currentUser?.role === 'admin' || currentUser?.role === 'profesor'">
                 <a routerLink="/students" routerLinkActive="bg-blue-100 text-blue-700"
                    class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +66,7 @@ import { CommonModule } from '@angular/common';
                 </a>
               </li>
               
-              <li *ngIf="currentUser?.role === 'admin' || currentUser?.role === 'teacher'">
+              <li *ngIf="currentUser?.role === 'admin' || currentUser?.role === 'profesor'">
                 <a routerLink="/courses" routerLinkActive="bg-blue-100 text-blue-700"
                    class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -167,7 +167,7 @@ import { CommonModule } from '@angular/common';
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               
               <button routerLink="/students" 
-                      *ngIf="currentUser?.role === 'admin' || currentUser?.role === 'teacher'"
+                      *ngIf="currentUser?.role === 'admin' || currentUser?.role === 'profesor'"
                       class="bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-lg transition-colors flex flex-col items-center">
                 <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -175,7 +175,7 @@ import { CommonModule } from '@angular/common';
                 <span class="font-semibold">Nuevo Estudiante</span>
               </button>
 
-              <button *ngIf="currentUser?.role === 'admin' || currentUser?.role === 'teacher'"
+              <button *ngIf="currentUser?.role === 'admin' || currentUser?.role === 'profesor'"
                       class="bg-green-500 hover:bg-green-600 text-white p-6 rounded-lg transition-colors flex flex-col items-center">
                 <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
