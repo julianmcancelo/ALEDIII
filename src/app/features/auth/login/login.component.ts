@@ -11,6 +11,27 @@ import Swal from 'sweetalert2';
   imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <!-- Botón flotante para credenciales de demo -->
+      <div class="fixed top-4 right-4 z-10">
+        <button type="button" (click)="toggleDemoCredentials()" class="bg-indigo-600 text-white rounded-full p-3 shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H5v-2H3v-2H1v-4a6 6 0 016-6h4a6 6 0 016 6z" />
+          </svg>
+        </button>
+
+        <!-- Panel de credenciales -->
+        <div *ngIf="showDemoCredentials" class="absolute top-14 right-0 w-72 p-4 bg-white rounded-lg shadow-xl border border-gray-200">
+          <h4 class="text-sm font-medium text-gray-800 mb-2">Usuarios de Prueba</h4>
+          <ul class="space-y-2 text-xs text-gray-600">
+            <li *ngFor="let user of demoUsers" class="border-b pb-1 last:border-b-0">
+              <p><strong>Rol:</strong> <span class="font-mono">{{ user.role }}</span></p>
+              <p><strong>Email:</strong> <span class="font-mono">{{ user.email }}</span></p>
+              <p><strong>Clave:</strong> <span class="font-mono">{{ user.password }}</span></p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
       <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <img class="mx-auto h-12 w-auto" src="/assets/logo.png" alt="Instituto Beltrán">
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -52,17 +73,8 @@ import Swal from 'sweetalert2';
             </div>
           </form>
 
-          <div class="mt-6">
-            <div class="relative">
-              <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-gray-300"></div>
-              </div>
-              <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-white text-gray-500"> O ingresa con un usuario de prueba </span>
-              </div>
-            </div>
-
-            <div class="mt-6 grid grid-cols-1 gap-3">
+          <div class="mt-6 pt-6 border-t border-gray-200">
+            <div class="grid grid-cols-1 gap-3">
               <button type="button" (click)="loginAs('admin')" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
                 <span>👨‍💼 Admin</span>
               </button>
@@ -73,24 +85,6 @@ import Swal from 'sweetalert2';
                 <span>👨‍🏫 Profesor</span>
               </button>
             </div>
-
-            <div class="mt-4">
-              <button type="button" (click)="toggleDemoCredentials()" class="w-full text-sm text-indigo-600 hover:text-indigo-500 font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                {{ showDemoCredentials ? 'Ocultar' : 'Mostrar' }} Credenciales de Demo
-              </button>
-            </div>
-
-            <div *ngIf="showDemoCredentials" class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h4 class="text-sm font-medium text-gray-800 mb-2">Usuarios de Prueba</h4>
-              <ul class="space-y-2 text-xs text-gray-600">
-                <li *ngFor="let user of demoUsers">
-                  <p><strong>Rol:</strong> {{ user.role }}</p>
-                  <p><strong>Email:</strong> {{ user.email }}</p>
-                  <p><strong>Clave:</strong> {{ user.password }}</p>
-                </li>
-              </ul>
-            </div>
-
           </div>
         </div>
       </div>
