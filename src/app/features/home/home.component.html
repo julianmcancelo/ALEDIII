@@ -13,7 +13,21 @@
         <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Carreras</a>
         <a href="#noticias" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Noticias</a>
         <a href="#contacto" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Contacto</a>
-        <a routerLink="/auth/login" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">Iniciar Sesión</a>
+        <!-- Bloque dinámico para el estado de la sesión del usuario -->
+        <div *ngIf="currentUser; else showLoginButton" class="flex items-center space-x-4">
+          <span class="text-gray-700 font-medium">¡Hola, {{ currentUser.name }}!</span>
+          <a routerLink="/dashboard" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors duration-300">
+            Ir al Dashboard
+          </a>
+          <button (click)="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors duration-300">
+            Cerrar Sesión
+          </button>
+        </div>
+
+        <!-- Plantilla que se muestra si no hay usuario logueado -->
+        <ng-template #showLoginButton>
+          <a routerLink="/auth/login" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">Iniciar Sesión</a>
+        </ng-template>
       </div>
       <div class="md:hidden">
         <button (click)="toggleMenu()" class="text-gray-600 hover:text-blue-600 focus:outline-none">
@@ -29,7 +43,21 @@
       <a href="#" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Carreras</a>
       <a href="#noticias" (click)="toggleMenu()" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Noticias</a>
       <a href="#contacto" (click)="toggleMenu()" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Contacto</a>
-      <a routerLink="/auth/login" class="block px-6 py-3 text-white bg-blue-600 hover:bg-blue-700">Iniciar Sesión</a>
+      <!-- Bloque dinámico para el menú móvil -->
+      <div *ngIf="currentUser; else showMobileLoginButton" class="px-6 py-3">
+        <div class="text-gray-700 font-medium mb-3">¡Hola, {{ currentUser.name }}!</div>
+        <a routerLink="/dashboard" (click)="toggleMenu()" class="block w-full text-center mb-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors duration-300">
+          Ir al Dashboard
+        </a>
+        <button (click)="logout(); toggleMenu()" class="block w-full text-center bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors duration-300">
+          Cerrar Sesión
+        </button>
+      </div>
+
+      <!-- Plantilla para el botón de Iniciar Sesión en móvil -->
+      <ng-template #showMobileLoginButton>
+        <a routerLink="/auth/login" (click)="toggleMenu()" class="block px-6 py-3 text-white bg-blue-600 hover:bg-blue-700">Iniciar Sesión</a>
+      </ng-template>
     </div>
   </header>
 
