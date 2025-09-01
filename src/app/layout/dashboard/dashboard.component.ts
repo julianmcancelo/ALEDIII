@@ -4,10 +4,9 @@ import { AuthService, User } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  template: `
+    selector: 'app-dashboard',
+    imports: [CommonModule, RouterModule],
+    template: `
     <div class="min-h-screen bg-gray-50">
       <!-- Header -->
       <header class="bg-blue-600 text-white shadow-md">

@@ -7,10 +7,9 @@ import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-student-form',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  template: `
+    selector: 'app-student-form',
+    imports: [CommonModule, ReactiveFormsModule],
+    template: `
     <div class="p-6">
       <div class="max-w-4xl mx-auto">
         <div class="bg-white rounded-lg shadow-lg">

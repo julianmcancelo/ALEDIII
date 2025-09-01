@@ -8,11 +8,10 @@ import { User, AuthService } from '../../core/services/auth.service';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+    selector: 'app-home',
+    imports: [CommonModule, RouterLink, ReactiveFormsModule],
+    templateUrl: './home.component.html',
+    styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit, OnDestroy {
   subscriptionForm: FormGroup;

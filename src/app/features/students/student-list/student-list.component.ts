@@ -7,10 +7,9 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-student-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
-  template: `
+    selector: 'app-student-list',
+    imports: [CommonModule, RouterModule, FormsModule],
+    template: `
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-900">Gestión de Estudiantes</h1>
