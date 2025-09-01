@@ -9,7 +9,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'student' | 'teacher';
+  role: 'admin' | 'student' | 'profesor';
   password?: string;
 }
 
@@ -74,7 +74,7 @@ export class AuthService {
   }
 
   isTeacher(): boolean {
-    return this.hasRole('teacher');
+    return this.hasRole('profesor');
   }
 
   isStudent(): boolean {
