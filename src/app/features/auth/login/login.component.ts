@@ -69,10 +69,28 @@ import Swal from 'sweetalert2';
               <button type="button" (click)="loginAs('student')" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
                 <span>🎓 Estudiante</span>
               </button>
-              <button type="button" (click)="loginAs('teacher')" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <button type="button" (click)="loginAs('profesor')" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
                 <span>👨‍🏫 Profesor</span>
               </button>
             </div>
+
+            <div class="mt-4">
+              <button type="button" (click)="toggleDemoCredentials()" class="w-full text-sm text-indigo-600 hover:text-indigo-500 font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                {{ showDemoCredentials ? 'Ocultar' : 'Mostrar' }} Credenciales de Demo
+              </button>
+            </div>
+
+            <div *ngIf="showDemoCredentials" class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <h4 class="text-sm font-medium text-gray-800 mb-2">Usuarios de Prueba</h4>
+              <ul class="space-y-2 text-xs text-gray-600">
+                <li *ngFor="let user of demoUsers">
+                  <p><strong>Rol:</strong> {{ user.role }}</p>
+                  <p><strong>Email:</strong> {{ user.email }}</p>
+                  <p><strong>Clave:</strong> {{ user.password }}</p>
+                </li>
+              </ul>
+            </div>
+
           </div>
         </div>
       </div>
@@ -84,6 +102,15 @@ export class LoginComponent {
   loginForm: FormGroup;
   hidePassword = true;
   isLoading = false;
+  showDemoCredentials = false;
+
+  demoUsers = [
+    { email: 'admin@ibeltran.com.ar', password: 'AdminPassword2025!', role: 'Administrador' },
+    { email: 'sebastian.saldivar@ibeltran.com.ar', password: 'ProfeSaldivar2025!', role: 'Profesor' },
+    { email: 'jose.casalnovo@ibeltran.com.ar', password: 'ProfeCasalnovo2025!', role: 'Profesor' },
+    { email: 'gabriela.tajes@ibeltran.com.ar', password: 'ProfeTajes2025!', role: 'Profesor' },
+    { email: 'sebastian.ceballos@ibeltran.com.ar', password: 'ProfeCeballos2025!', role: 'Profesor' }
+  ];
 
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
@@ -94,6 +121,10 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  toggleDemoCredentials() {
+    this.showDemoCredentials = !this.showDemoCredentials;
   }
 
   onSubmit() {
@@ -136,14 +167,20 @@ export class LoginComponent {
     });
   }
 
-  loginAs(role: 'admin' | 'student' | 'teacher') {
+  loginAs(role: 'admin' | 'student' | 'profesor') {
     const credentials = {
-      admin: { email: 'admin@beltran.edu', password: 'admin123' },
-      student: { email: 'student@beltran.edu', password: 'student123' },
-      teacher: { email: 'teacher@beltran.edu', password: 'teacher123' }
+      admin: { email: 'admin@ibeltran.com.ar', password: 'AdminPassword2025!' },
+      // Usamos el primer profesor como ejemplo para el botón
+      profesor: { email: 'sebastian.saldivar@ibeltran.com.ar', password: 'ProfeSaldivar2025!' },
+      // El rol estudiante no tiene un usuario de prueba en el recurso 'users', lo quitamos por ahora
+      student: { email: 'alumno@ibeltran.com.ar', password: 'password' } // Este usuario no existe en la API de users
     };
 
-    this.loginForm.patchValue(credentials[role]);
-    this.onSubmit();
+    if (role !== 'student') {
+      this.loginForm.patchValue(credentials[role]);
+      this.onSubmit();
+    } else {
+      Swal.fire('Info', 'La funcionalidad de login para estudiantes no está implementada en este demo.', 'info');
+    }
   }
 }
