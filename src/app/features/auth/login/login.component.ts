@@ -6,9 +6,10 @@ import { AuthService } from '../../../core/services/auth.service';
 import Swal from 'sweetalert2';
 
 @Component({
-    selector: 'app-login',
-    imports: [CommonModule, ReactiveFormsModule],
-    template: `
+  selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  template: `
     <div class="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <!-- Botón flotante para credenciales de demo -->
       <div class="fixed top-4 right-4 z-10">
@@ -76,7 +77,7 @@ import Swal from 'sweetalert2';
       </div>
     </div>
   `,
-    styles: []
+  styles: []
 })
 export class LoginComponent {
   loginForm: FormGroup;

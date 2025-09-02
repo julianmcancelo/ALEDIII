@@ -2,11 +2,16 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
 import { HomeComponent } from './features/home/home.component';
+import { GalleryComponent } from './features/gallery/gallery.component';
 
 export const routes: Routes = [
   {
     path: '',
     component: HomeComponent
+  },
+  {
+    path: 'instalaciones',
+    component: GalleryComponent
   },
   {
     path: 'auth',

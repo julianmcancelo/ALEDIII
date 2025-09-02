@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-    selector: 'app-example',
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-example',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
     <div class="example-container">
       <h2>Angular 17 Features Demo</h2>
       
@@ -46,7 +47,7 @@ import { FormsModule } from '@angular/forms';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .example-container {
       max-width: 600px;
       margin: 2rem auto;

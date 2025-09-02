@@ -11,6 +11,7 @@
       <div class="hidden md:flex items-center space-x-6">
         <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Inicio</a>
         <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Carreras</a>
+        <a routerLink="/instalaciones" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Instalaciones</a>
         <a href="#noticias" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Noticias</a>
         <a href="#contacto" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Contacto</a>
         <!-- Bloque dinámico para el estado de la sesión del usuario -->
@@ -41,6 +42,7 @@
     <div [hidden]="!isMenuOpen" class="md:hidden bg-white shadow-lg absolute w-full">
       <a href="#" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Inicio</a>
       <a href="#" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Carreras</a>
+      <a routerLink="/instalaciones" (click)="toggleMenu()" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Instalaciones</a>
       <a href="#noticias" (click)="toggleMenu()" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Noticias</a>
       <a href="#contacto" (click)="toggleMenu()" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Contacto</a>
       <!-- Bloque dinámico para el menú móvil -->
@@ -64,16 +66,77 @@
   <!-- Main Content -->
   <main>
     <!-- =================================================================== -->
-    <!-- Hero Section: Banner principal de la página de inicio.           -->
-    <!-- Muestra el título principal y una descripción sobre la imagen     -->
-    <!-- de fondo.                                                         -->
+    <!-- Slider Section: Banner principal con slider para la institución   -->
     <!-- =================================================================== -->
-    <section class="bg-cover bg-center h-screen text-white" style="background-image: url('assets/images/home/home.jpg');">
-      <div class="container mx-auto h-full flex items-center justify-center">
-        <div class="text-center bg-black bg-opacity-50 p-8 rounded-lg">
-          <h1 class="text-5xl font-extrabold mb-4">CENTRO DE FORMACIÓN PROFESIONAL N° 411</h1>
-          <p class="text-xl max-w-3xl mx-auto">El Centro de Formación Profesional (CFP) Nº 411 de Avellaneda, surge de un convenio celebrado entre la Dirección General de Cultura y Educación de la Provincia de Buenos Aires, la Unión Obrera Metalúrgica -Seccional Avellaneda-, y la Asociación Civil DISAL, con el objetivo de promover la formación profesional y laboral de jóvenes y adultos de la toda la comunidad.</p>
+    <section class="relative h-screen">
+      <!-- Contenedor del slider -->
+      <div class="relative h-full overflow-hidden">
+        <!-- Slides -->
+        <div class="slides-container h-full" [style.transform]="'translateX(' + (-currentSlide * 100) + '%)'">
+          <!-- Slide 1 -->
+          <div class="slide absolute w-full h-full bg-cover bg-center transition-opacity duration-1000"
+               [ngClass]="{'opacity-100': currentSlide === 0, 'opacity-0': currentSlide !== 0}"
+               style="background-image: url('assets/images/home/home.jpg');">
+            <div class="container mx-auto h-full flex items-center justify-center">
+              <div class="text-center bg-black bg-opacity-50 p-8 rounded-lg text-white max-w-4xl">
+                <h1 class="text-5xl font-extrabold mb-4">CENTRO DE FORMACIÓN PROFESIONAL N° 411</h1>
+                <p class="text-xl">El Centro de Formación Profesional (CFP) Nº 411 de Avellaneda, surge de un convenio celebrado entre la Dirección General de Cultura y Educación de la Provincia de Buenos Aires, la Unión Obrera Metalúrgica -Seccional Avellaneda-, y la Asociación Civil DISAL, con el objetivo de promover la formación profesional y laboral de jóvenes y adultos de la toda la comunidad.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Slide 2 -->
+          <div class="slide absolute w-full h-full bg-cover bg-center transition-opacity duration-1000"
+               [ngClass]="{'opacity-100': currentSlide === 1, 'opacity-0': currentSlide !== 1}"
+               style="background-image: url('assets/images/home/noticia_110.jpg');">
+            <div class="container mx-auto h-full flex items-center justify-center">
+              <div class="text-center bg-black bg-opacity-50 p-8 rounded-lg text-white max-w-4xl">
+                <h1 class="text-5xl font-extrabold mb-4">FORMACIÓN PROFESIONAL</h1>
+                <p class="text-xl">Ofrecemos cursos y programas de formación diseñados para satisfacer las demandas del mercado laboral actual, con un enfoque práctico y profesional.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Slide 3 -->
+          <div class="slide absolute w-full h-full bg-cover bg-center transition-opacity duration-1000"
+               [ngClass]="{'opacity-100': currentSlide === 2, 'opacity-0': currentSlide !== 2}"
+               style="background-image: url('assets/images/home/noticia_104.jpg');">
+            <div class="container mx-auto h-full flex items-center justify-center">
+              <div class="text-center bg-black bg-opacity-50 p-8 rounded-lg text-white max-w-4xl">
+                <h1 class="text-5xl font-extrabold mb-4">INSTALACIONES DE VANGUARDIA</h1>
+                <p class="text-xl">Contamos con talleres, laboratorios y espacios de aprendizaje equipados con tecnología de última generación para asegurar una formación de calidad.</p>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- Controles del slider -->
+        <div class="absolute bottom-5 left-0 right-0 flex justify-center space-x-2">
+          <button *ngFor="let _ of [0, 1, 2]; let i = index" 
+                  class="w-3 h-3 rounded-full transition-all duration-300" 
+                  [ngClass]="{'bg-white': currentSlide === i, 'bg-gray-400': currentSlide !== i}"
+                  (click)="setSlide(i)"
+                  [attr.aria-label]="'Ir a slide ' + (i + 1)">
+          </button>
+        </div>
+
+        <!-- Botones de navegación -->
+        <button 
+          class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-50 text-white p-2 rounded-full transition-all duration-300"
+          (click)="prevSlide()"
+          [attr.aria-label]="'Slide anterior'">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button 
+          class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-50 text-white p-2 rounded-full transition-all duration-300"
+          (click)="nextSlide()"
+          [attr.aria-label]="'Siguiente slide'">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
     </section>
 
@@ -139,6 +202,7 @@
           <div class="bg-white p-6 rounded-lg shadow-lg">
             <h3 class="text-xl font-semibold text-gray-800 mb-4">Otros Destacados</h3>
             <ul class="space-y-2">
+              <li><a routerLink="/instalaciones" class="text-gray-600 hover:text-blue-600">Galería de instalaciones</a></li>
               <li><a href="#" class="text-gray-600 hover:text-blue-600">Un paseo por el Edificio</a></li>
               <li><a href="#" class="text-gray-600 hover:text-blue-600">Office 365</a></li>
             </ul>

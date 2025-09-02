@@ -4,9 +4,10 @@ import { RouterModule } from '@angular/router';
 import { AuthService, User } from '../../../core/services/auth.service';
 
 @Component({
-    selector: 'app-dashboard-home',
-    imports: [CommonModule, RouterModule],
-    templateUrl: './dashboard-home.component.html'
+  selector: 'app-dashboard-home',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './dashboard-home.component.html',
 })
 export class DashboardHomeComponent implements OnInit {
   currentUser: User | null = null;
