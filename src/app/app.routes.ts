@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './core/guards/auth.guard';
-import { RoleGuard } from './core/guards/role.guard';
-import { HomeComponent } from './features/home/home.component';
-import { GalleryComponent } from './features/gallery/gallery.component';
+import { AuthGuard } from './nucleo/guardias/auth.guard';
+import { RoleGuard } from './nucleo/guardias/role.guard';
+import { HomeComponent } from './funcionalidades/inicio/home.component';
+import { GalleryComponent } from './funcionalidades/galeria/gallery.component';
 
 export const routes: Routes = [
   {
@@ -15,21 +15,22 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
-    loadChildren: () => import('./features/auth/auth-routing.module').then(m => m.AuthRoutingModule)
+    loadChildren: () => import('./funcionalidades/autenticacion/auth-routing.module').then(m => m.AuthRoutingModule)
   },
   {
     path: 'dashboard',
+    loadComponent: () => import('./diseno/panel/dashboard.component').then(c => c.DashboardComponent),
     canActivate: [AuthGuard],
-    loadComponent: () => import('./layout/dashboard/dashboard.component').then(m => m.DashboardComponent),
-    children: [
-      { path: '', loadComponent: () => import('./layout/dashboard/dashboard-home/dashboard-home.component').then(m => m.DashboardHomeComponent) },
-    ]
+    children: [{
+      path: '',
+      loadComponent: () => import('./diseno/panel/panel-inicio/dashboard-home.component').then(c => c.DashboardHomeComponent)
+    }]
   },
   {
     path: 'estudiantes',
-    loadChildren: () => import('./features/students/students-routing.module').then(m => m.StudentsRoutingModule),
+    loadChildren: () => import('./funcionalidades/estudiantes/students-routing.module').then(m => m.StudentsRoutingModule),
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['admin', 'profesor'] }
+    data: { requiredRoles: ['admin', 'secretario'] }
   },
   {
     path: '**',

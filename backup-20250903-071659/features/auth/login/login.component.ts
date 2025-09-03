@@ -5,7 +5,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../nucleo/servicios/auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 import Swal from 'sweetalert2'; // Librería para mostrar alertas bonitas
 
 @Component({
