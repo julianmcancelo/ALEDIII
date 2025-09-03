@@ -39,6 +39,12 @@ export const routes: Routes = [
     data: { requiredRoles: ['admin'] }
   },
   {
+    path: 'registro-usuario',
+    loadChildren: () => import('./funcionalidades/administracion/registro-usuario/registro-usuario.module').then(m => m.RegistroUsuarioModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { requiredRoles: ['admin'] }
+  },
+  {
     path: '**',
     redirectTo: ''
   }
