@@ -33,6 +33,12 @@ export const routes: Routes = [
     data: { requiredRoles: ['admin', 'secretario'] }
   },
   {
+    path: 'gestion-usuarios',
+    loadComponent: () => import('./funcionalidades/administracion/gestion-usuarios/gestion-usuarios.component').then(c => c.GestionUsuariosComponent),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { requiredRoles: ['admin'] }
+  },
+  {
     path: '**',
     redirectTo: ''
   }

@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 })
 export class StudentService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.mockapiUrl}/students`;
+  private apiUrl = `${environment.apiUrl}/students`;
 
   getEstudiantes(): Observable<Estudiante[]> {
     return this.http.get<Estudiante[]>(this.apiUrl);

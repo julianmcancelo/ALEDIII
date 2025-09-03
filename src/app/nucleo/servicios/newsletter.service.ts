@@ -14,7 +14,7 @@ export interface Subscription {
 })
 export class NewsletterService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.mockapiUrl}/newsletter`;
+  private apiUrl = `${environment.apiUrl}/newsletter`;
 
   subscribe(email: string): Observable<Subscription> {
     const newSubscription: Subscription = {
