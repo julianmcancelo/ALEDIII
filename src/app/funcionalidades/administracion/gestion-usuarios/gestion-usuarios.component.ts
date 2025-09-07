@@ -1,9 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { UserService, Usuario, CrearUsuarioRequest } from '../../../nucleo/servicios/user.service';
+import { UserService } from '../../../nucleo/servicios/user.service';
+import { User, UserRole } from '../../../nucleo/modelos/user.model';
 import { AuthService } from '../../../nucleo/servicios/auth.service';
-import { ModalCrearUsuarioComponent, TipoUsuario } from '../../../compartido/modales/modal-crear-usuario/modal-crear-usuario.component';
+import { ModalCrearUsuarioComponent } from '../../../compartido/modales/modal-crear-usuario/modal-crear-usuario.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -133,13 +134,13 @@ import Swal from 'sweetalert2';
   `
 })
 export class GestionUsuariosComponent implements OnInit {
-  usuarios: Usuario[] = [];
+  usuarios: User[] = [];
   cargandoUsuarios = false;
   currentUser: any = null;
   
   // Variables para el modal
   mostrarModal = false;
-  tipoUsuarioSeleccionado: TipoUsuario = 'student';
+  tipoUsuarioSeleccionado: UserRole = 'student';
 
   private userService = inject(UserService);
   private authService = inject(AuthService);
@@ -166,7 +167,7 @@ export class GestionUsuariosComponent implements OnInit {
     });
   }
 
-  abrirModal(tipo: TipoUsuario): void {
+  abrirModal(tipo: UserRole): void {
     console.log('Abriendo modal para tipo:', tipo); // Debug
     this.tipoUsuarioSeleccionado = tipo;
     this.mostrarModal = true;
@@ -181,7 +182,7 @@ export class GestionUsuariosComponent implements OnInit {
     this.cargarUsuarios(); // Recargar la lista de usuarios
   }
 
-  eliminarUsuario(usuario: Usuario): void {
+  eliminarUsuario(usuario: User): void {
     Swal.fire({
       title: '¿Estás seguro?',
       text: `¿Deseas eliminar al usuario ${usuario.name}?`,

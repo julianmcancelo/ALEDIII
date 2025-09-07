@@ -1,10 +1,11 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { UserService, CrearUsuarioRequest } from '../../../nucleo/servicios/user.service';
+import { UserService } from '../../../nucleo/servicios/user.service';
+import { CreateUserRequest, UserRole } from '../../../nucleo/modelos/user.model';
 import Swal from 'sweetalert2';
 
-export type TipoUsuario = 'student' | 'profesor' | 'admin';
+// Ahora usamos UserRole del modelo user.model.ts
 
 @Component({
   selector: 'app-modal-crear-usuario',
@@ -226,7 +227,7 @@ export type TipoUsuario = 'student' | 'profesor' | 'admin';
 })
 export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
   @Input() mostrar = false;
-  @Input() tipoUsuario: TipoUsuario = 'student';
+  @Input() tipoUsuario: UserRole = 'student';
   @Output() cerrarModal = new EventEmitter<void>();
   @Output() usuarioCreado = new EventEmitter<any>();
 
@@ -347,11 +348,17 @@ export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
     }
 
     this.cargando = true;
-    const datosUsuario: CrearUsuarioRequest = {
+    const datosUsuario: CreateUserRequest = {
       name: this.formulario.get('name')?.value,
       email: this.formulario.get('email')?.value,
       password: this.formulario.get('password')?.value,
-      role: this.tipoUsuario
+      role: this.tipoUsuario,
+      dni: this.tipoUsuario === 'student' ? this.formulario.get('dni')?.value : undefined,
+      legajo: (this.tipoUsuario === 'student' || this.tipoUsuario === 'profesor') ? this.formulario.get('legajo')?.value : undefined,
+      carrera: this.tipoUsuario === 'student' ? this.formulario.get('carrera')?.value : undefined,
+      especialidad: this.tipoUsuario === 'profesor' ? this.formulario.get('especialidad')?.value : undefined,
+      telefono: this.tipoUsuario === 'profesor' ? this.formulario.get('telefono')?.value : undefined,
+      departamento: this.tipoUsuario === 'admin' ? this.formulario.get('departamento')?.value : undefined
     };
 
     this.userService.crearUsuario(datosUsuario).subscribe({

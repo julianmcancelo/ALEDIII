@@ -8,8 +8,10 @@ class AuthController {
     }
 
     public function login() {
+        // Leer datos JSON del cuerpo de la petición
         $input = json_decode(file_get_contents('php://input'), true);
         
+        // Verificar que existan email y password
         if (!isset($input['email']) || !isset($input['password'])) {
             http_response_code(400);
             echo json_encode(['error' => 'Email y contraseña requeridos']);
@@ -20,21 +22,36 @@ class AuthController {
         $password = $input['password'];
 
         try {
+            // Buscar usuario por email
             $stmt = $this->db->prepare("SELECT * FROM usuarios WHERE email = ?");
             $stmt->execute([$email]);
-            $user = $stmt->fetch();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            // Depurar información (solo desarrollo)
+            error_log("Usuario encontrado: " . ($user ? 'Sí' : 'No'));
+            if ($user) {
+                error_log("Password hash en BD: " . $user['password_hash']);
+            }
+            
+            // Verificar contraseña con password_verify (para hash bcrypt)
             if ($user && password_verify($password, $user['password_hash'])) {
-                // Remover password_hash de la respuesta
+                // Autenticación exitosa - remover password_hash de la respuesta
                 unset($user['password_hash']);
+                
+                header('Content-Type: application/json');
                 echo json_encode($user);
             } else {
+                // Autenticación fallida
                 http_response_code(401);
+                header('Content-Type: application/json');
                 echo json_encode(['error' => 'Credenciales inválidas']);
             }
         } catch (PDOException $e) {
+            // Error de base de datos
+            error_log("Error en login: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['error' => 'Error de base de datos']);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Error de base de datos: ' . $e->getMessage()]);
         }
     }
 

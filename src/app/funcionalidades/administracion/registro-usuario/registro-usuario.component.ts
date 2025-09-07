@@ -1,11 +1,20 @@
+/**
+ * @file registro-usuario.component.ts
+ * @description Componente para el registro de usuarios basado en la estructura MySQL
+ * 
+ * TP Final Algoritmos y Estructuras de Datos III - 2025
+ * Alumnos: CANCELO JULIAN - NICOLAS OTERO (Curso 3ra 1RA)
+ * Profesor: Sebastian Saldivar
+ */
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { UserService, CrearUsuarioRequest } from '../../../nucleo/servicios/user.service';
+import { UserService } from '../../../nucleo/servicios/user.service';
+import { CreateUserRequest, UserRole, Departamento } from '../../../nucleo/modelos/user.model';
 import Swal from 'sweetalert2';
 
-export type TipoUsuario = 'student' | 'profesor' | 'admin';
+// Usamos los tipos definidos en user.model.ts
 
 @Component({
   selector: 'app-registro-usuario',
@@ -165,6 +174,24 @@ export type TipoUsuario = 'student' | 'profesor' | 'admin';
                   </div>
                   
                   <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Legajo</label>
+                    <input 
+                      type="text" 
+                      formControlName="legajo" 
+                      placeholder="Ej: EST-12345"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      [class.border-red-500]="formulario.get('legajo')?.invalid && formulario.get('legajo')?.touched">
+                    <div *ngIf="formulario.get('legajo')?.hasError('required') && formulario.get('legajo')?.touched" 
+                         class="mt-1 text-sm text-red-600">
+                      El legajo es requerido
+                    </div>
+                    <div *ngIf="formulario.get('legajo')?.hasError('maxlength') && formulario.get('legajo')?.touched" 
+                         class="mt-1 text-sm text-red-600">
+                      El legajo no puede exceder los 20 caracteres
+                    </div>
+                  </div>
+                  
+                  <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Carrera</label>
                     <select 
                       formControlName="carrera"
@@ -183,6 +210,24 @@ export type TipoUsuario = 'student' | 'profesor' | 'admin';
                 </div>
 
                 <div *ngIf="tipoUsuario === 'profesor'" class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Legajo</label>
+                    <input 
+                      type="text" 
+                      formControlName="legajo" 
+                      placeholder="Ej: PROF-54321"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                      [class.border-red-500]="formulario.get('legajo')?.invalid && formulario.get('legajo')?.touched">
+                    <div *ngIf="formulario.get('legajo')?.hasError('required') && formulario.get('legajo')?.touched" 
+                         class="mt-1 text-sm text-red-600">
+                      El legajo es requerido
+                    </div>
+                    <div *ngIf="formulario.get('legajo')?.hasError('maxlength') && formulario.get('legajo')?.touched" 
+                         class="mt-1 text-sm text-red-600">
+                      El legajo no puede exceder los 20 caracteres
+                    </div>
+                  </div>
+                  
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Especialidad</label>
                     <input 
@@ -332,7 +377,7 @@ export type TipoUsuario = 'student' | 'profesor' | 'admin';
   `
 })
 export class RegistroUsuarioComponent implements OnInit {
-  tipoUsuario: TipoUsuario = 'student';
+  tipoUsuario: UserRole = 'student';  // Usando el tipo de user.model.ts
   formulario: FormGroup;
   cargando = false;
 
@@ -342,16 +387,22 @@ export class RegistroUsuarioComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   constructor() {
+    // Formulario ajustado según la estructura de tabla MySQL
     this.formulario = this.fb.group({
-      name: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      // Campos obligatorios según la tabla
+      name: ['', [Validators.required, Validators.maxLength(255)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
-      dni: [''],
-      carrera: [''],
-      especialidad: [''],
-      telefono: [''],
-      departamento: [''],
+      
+      // Campos opcionales según la estructura de la tabla
+      dni: ['', [Validators.maxLength(20)]],
+      legajo: ['', [Validators.maxLength(20)]],  // Nuevo campo agregado según la tabla MySQL
+      carrera: ['', [Validators.maxLength(100)]],
+      especialidad: ['', [Validators.maxLength(100)]],
+      telefono: ['', [Validators.maxLength(20)]],
+      departamento: [''],  // Enum en MySQL: 'Dirección','Secretaría','Administración','Sistemas'
+      
       aceptaTerminos: [false, [Validators.requiredTrue]]
     }, { validators: this.passwordMatchValidator });
   }
@@ -360,7 +411,7 @@ export class RegistroUsuarioComponent implements OnInit {
     // Obtener tipo de usuario de la URL si existe
     this.route.queryParams.subscribe(params => {
       if (params['tipo'] && ['student', 'profesor', 'admin'].includes(params['tipo'])) {
-        this.tipoUsuario = params['tipo'] as TipoUsuario;
+        this.tipoUsuario = params['tipo'] as UserRole;
         this.configurarValidaciones();
       }
     });
@@ -378,7 +429,7 @@ export class RegistroUsuarioComponent implements OnInit {
     return null;
   }
 
-  cambiarTipoUsuario(tipo: TipoUsuario): void {
+  cambiarTipoUsuario(tipo: UserRole): void {
     this.tipoUsuario = tipo;
     this.configurarValidaciones();
     this.formulario.reset({
@@ -387,32 +438,51 @@ export class RegistroUsuarioComponent implements OnInit {
   }
 
   configurarValidaciones(): void {
+    // Obtener referencias a los controles del formulario
     const dniControl = this.formulario.get('dni');
+    const legajoControl = this.formulario.get('legajo'); // Nuevo campo según MySQL
     const carreraControl = this.formulario.get('carrera');
     const especialidadControl = this.formulario.get('especialidad');
     const departamentoControl = this.formulario.get('departamento');
+    const telefonoControl = this.formulario.get('telefono');
 
     // Limpiar validaciones previas
     dniControl?.clearValidators();
+    legajoControl?.clearValidators();
     carreraControl?.clearValidators();
     especialidadControl?.clearValidators();
     departamentoControl?.clearValidators();
+    telefonoControl?.clearValidators();
 
-    // Aplicar validaciones según el tipo de usuario
+    // Mantener validaciones de longitud máxima según MySQL
+    dniControl?.setValidators([Validators.maxLength(20)]);
+    legajoControl?.setValidators([Validators.maxLength(20)]);
+    carreraControl?.setValidators([Validators.maxLength(100)]);
+    especialidadControl?.setValidators([Validators.maxLength(100)]);
+    telefonoControl?.setValidators([Validators.maxLength(20)]);
+
+    // Aplicar validaciones adicionales según el tipo de usuario
     if (this.tipoUsuario === 'student') {
-      dniControl?.setValidators([Validators.required]);
-      carreraControl?.setValidators([Validators.required]);
+      dniControl?.addValidators([Validators.required]);
+      legajoControl?.addValidators([Validators.required]); // El legajo es obligatorio para estudiantes
+      carreraControl?.addValidators([Validators.required]);
     } else if (this.tipoUsuario === 'profesor') {
-      especialidadControl?.setValidators([Validators.required]);
+      legajoControl?.addValidators([Validators.required]); // El legajo también es para profesores
+      especialidadControl?.addValidators([Validators.required]);
+      telefonoControl?.addValidators([Validators.required]);
     } else if (this.tipoUsuario === 'admin') {
-      departamentoControl?.setValidators([Validators.required]);
+      departamentoControl?.addValidators([Validators.required]);
+      // Validador para asegurar que el departamento sea uno de los valores del enum MySQL
+      departamentoControl?.addValidators([Validators.pattern('Dirección|Secretaría|Administración|Sistemas')]);
     }
 
     // Actualizar validaciones
     dniControl?.updateValueAndValidity();
+    legajoControl?.updateValueAndValidity();
     carreraControl?.updateValueAndValidity();
     especialidadControl?.updateValueAndValidity();
     departamentoControl?.updateValueAndValidity();
+    telefonoControl?.updateValueAndValidity();
   }
 
   getTitulo(): string {
@@ -467,30 +537,30 @@ export class RegistroUsuarioComponent implements OnInit {
     }
 
     this.cargando = true;
-    const datosUsuario: CrearUsuarioRequest = {
+    // Crear objeto de datos según la estructura MySQL
+    const datosUsuario: CreateUserRequest = {
       name: this.formulario.get('name')?.value,
       email: this.formulario.get('email')?.value,
       password: this.formulario.get('password')?.value,
-      role: this.tipoUsuario
+      role: this.tipoUsuario,
+      
+      // Incluir los campos adicionales según la estructura MySQL
+      dni: this.formulario.get('dni')?.value || null,
+      legajo: this.formulario.get('legajo')?.value || null,
+      carrera: this.tipoUsuario === 'student' ? this.formulario.get('carrera')?.value : null,
+      especialidad: this.tipoUsuario === 'profesor' ? this.formulario.get('especialidad')?.value : null,
+      telefono: this.formulario.get('telefono')?.value || null,
+      departamento: this.tipoUsuario === 'admin' ? 
+                   this.formulario.get('departamento')?.value as Departamento : undefined
     };
 
-    // Datos adicionales específicos que podrían enviarse a un endpoint diferente o procesarse de otra manera
-    const datosAdicionales: any = {};
-
-    if (this.tipoUsuario === 'student') {
-      datosAdicionales.dni = this.formulario.get('dni')?.value;
-      datosAdicionales.carrera = this.formulario.get('carrera')?.value;
-    } else if (this.tipoUsuario === 'profesor') {
-      datosAdicionales.especialidad = this.formulario.get('especialidad')?.value;
-      datosAdicionales.telefono = this.formulario.get('telefono')?.value;
-    } else if (this.tipoUsuario === 'admin') {
-      datosAdicionales.departamento = this.formulario.get('departamento')?.value;
-    }
+    // Ya no necesitamos datosAdicionales ya que todos los campos están incluidos en el objeto principal
+    // según la estructura de la tabla MySQL
 
     this.userService.crearUsuario(datosUsuario).subscribe({
       next: (usuario) => {
-        // Aquí se podrían guardar los datos adicionales en otra tabla
-        console.log('Datos adicionales a guardar:', datosAdicionales);
+        // Ya no necesitamos procesar datos adicionales
+        console.log('Usuario creado:', usuario);
         
         Swal.fire({
           icon: 'success',
