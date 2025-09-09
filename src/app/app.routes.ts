@@ -102,6 +102,12 @@ export const routes: Routes = [
         loadComponent: () => import('./funcionalidades/administracion/gestion-materias/gestion-materias.component').then(c => c.GestionMateriasComponent),
         canActivate: [AuthGuard, RoleGuard],
         data: { requiredRoles: ['admin'] }
+      },
+      {
+        path: 'gestion-profesores',
+        loadComponent: () => import('./funcionalidades/administracion/gestion-profesores/gestion-profesores.component').then(c => c.GestionProfesoresComponent),
+        canActivate: [AuthGuard, RoleGuard],
+        data: { requiredRoles: ['admin'] }
       }
     ]
   },

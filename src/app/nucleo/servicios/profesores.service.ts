@@ -9,6 +9,7 @@ export interface Profesor {
   email: string;
   especialidad?: string;
   departamento?: string;
+  telefono?: string;
   created_at: string;
 }
 
@@ -29,6 +30,6 @@ export class ProfesoresService {
   }
 
   getMateriasByProfesor(profesorId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/${profesorId}?materias=true`);
+    return this.http.get<any[]>(`${this.apiUrl}/${profesorId}/materias`);
   }
 }
