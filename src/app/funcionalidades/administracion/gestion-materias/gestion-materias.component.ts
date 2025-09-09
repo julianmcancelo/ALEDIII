@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MateriasService, Materia, CrearMateriaRequest } from '../../../nucleo/servicios/materias.service';
 import { CarrerasService, Carrera } from '../../../nucleo/servicios/carreras.service';
+import { ProfesoresService, Profesor } from '../../../nucleo/servicios/profesores.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -124,6 +125,18 @@ import Swal from 'sweetalert2';
                 </div>
                 
                 <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Profesor</label>
+                  <select 
+                    formControlName="profesor_id"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">Sin profesor asignado</option>
+                    <option *ngFor="let profesor of profesores" [value]="profesor.id">
+                      {{ profesor.name }} - {{ profesor.especialidad || 'Sin especialidad' }}
+                    </option>
+                  </select>
+                </div>
+                
+                <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Año *</label>
                   <select 
                     formControlName="anio"
@@ -236,7 +249,7 @@ import Swal from 'sweetalert2';
                       </span>
                     </div>
                     
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 mb-2">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm text-gray-600 mb-2">
                       <div>
                         <span class="font-medium">Carrera:</span>
                         <span class="block">{{ materia.carrera_nombre }}</span>
@@ -252,6 +265,12 @@ import Swal from 'sweetalert2';
                       <div>
                         <span class="font-medium">Horas:</span>
                         <span class="block">{{ materia.horas_semanales }}hs/semana</span>
+                      </div>
+                      <div>
+                        <span class="font-medium">Profesor:</span>
+                        <span class="block" [ngClass]="{'text-gray-400': !materia.profesor_nombre}">
+                          {{ materia.profesor_nombre || 'Sin asignar' }}
+                        </span>
                       </div>
                     </div>
                     
@@ -289,6 +308,7 @@ export class GestionMateriasComponent implements OnInit {
   materias: Materia[] = [];
   materiasFiltradas: Materia[] = [];
   carreras: Carrera[] = [];
+  profesores: Profesor[] = [];
   formulario: FormGroup;
   cargandoMaterias = false;
   cargando = false;
@@ -299,6 +319,7 @@ export class GestionMateriasComponent implements OnInit {
 
   private materiasService = inject(MateriasService);
   private carrerasService = inject(CarrerasService);
+  private profesoresService = inject(ProfesoresService);
   private fb = inject(FormBuilder);
 
   constructor() {
@@ -307,6 +328,7 @@ export class GestionMateriasComponent implements OnInit {
       codigo: ['', [Validators.required]],
       descripcion: [''],
       carrera_id: ['', [Validators.required]],
+      profesor_id: [''],
       anio: [1, [Validators.required]],
       cuatrimestre: ['anual'],
       horas_semanales: [4],
@@ -316,6 +338,7 @@ export class GestionMateriasComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarCarreras();
+    this.cargarProfesores();
     this.cargarMaterias();
   }
 
@@ -326,6 +349,17 @@ export class GestionMateriasComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar carreras:', error);
+      }
+    });
+  }
+
+  cargarProfesores(): void {
+    this.profesoresService.getProfesores().subscribe({
+      next: (profesores) => {
+        this.profesores = profesores;
+      },
+      error: (error) => {
+        console.error('Error al cargar profesores:', error);
       }
     });
   }
@@ -395,8 +429,9 @@ export class GestionMateriasComponent implements OnInit {
     this.formulario.patchValue({
       nombre: materia.nombre,
       codigo: materia.codigo,
-      descripcion: materia.descripcion || '',
+      descripcion: materia.descripcion,
       carrera_id: materia.carrera_id,
+      profesor_id: materia.profesor_id || '',
       anio: materia.anio,
       cuatrimestre: materia.cuatrimestre,
       horas_semanales: materia.horas_semanales,
@@ -451,6 +486,7 @@ export class GestionMateriasComponent implements OnInit {
       codigo: '',
       descripcion: '',
       carrera_id: '',
+      profesor_id: '',
       anio: 1,
       cuatrimestre: 'anual',
       horas_semanales: 4,

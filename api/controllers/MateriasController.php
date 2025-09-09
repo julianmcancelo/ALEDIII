@@ -12,9 +12,11 @@ class MateriasController {
     public function getMaterias() {
         try {
             $stmt = $this->db->prepare("
-                SELECT m.*, c.nombre as carrera_nombre 
+                SELECT m.*, c.nombre as carrera_nombre, 
+                       u.name as profesor_nombre, u.email as profesor_email
                 FROM materias m 
                 LEFT JOIN carreras c ON m.carrera_id = c.id 
+                LEFT JOIN usuarios u ON m.profesor_id = u.id AND u.role = 'profesor'
                 WHERE m.estado = 'activa' 
                 ORDER BY c.nombre, m.anio, m.nombre
             ");
@@ -33,9 +35,11 @@ class MateriasController {
     public function getMateriasByCarrera($carrera_id) {
         try {
             $stmt = $this->db->prepare("
-                SELECT m.*, c.nombre as carrera_nombre 
+                SELECT m.*, c.nombre as carrera_nombre, 
+                       u.name as profesor_nombre, u.email as profesor_email
                 FROM materias m 
                 LEFT JOIN carreras c ON m.carrera_id = c.id 
+                LEFT JOIN usuarios u ON m.profesor_id = u.id AND u.role = 'profesor'
                 WHERE m.carrera_id = ? AND m.estado = 'activa' 
                 ORDER BY m.anio, m.cuatrimestre, m.nombre
             ");
@@ -54,9 +58,11 @@ class MateriasController {
     public function getMateriasByAnio($carrera_id, $anio) {
         try {
             $stmt = $this->db->prepare("
-                SELECT m.*, c.nombre as carrera_nombre 
+                SELECT m.*, c.nombre as carrera_nombre, 
+                       u.name as profesor_nombre, u.email as profesor_email
                 FROM materias m 
                 LEFT JOIN carreras c ON m.carrera_id = c.id 
+                LEFT JOIN usuarios u ON m.profesor_id = u.id AND u.role = 'profesor'
                 WHERE m.carrera_id = ? AND m.anio = ? AND m.estado = 'activa' 
                 ORDER BY m.cuatrimestre, m.nombre
             ");
@@ -138,8 +144,8 @@ class MateriasController {
             $id = $this->generateUUID();
             
             $stmt = $this->db->prepare("
-                INSERT INTO materias (id, nombre, codigo, descripcion, carrera_id, anio, cuatrimestre, horas_semanales, estado) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO materias (id, nombre, codigo, descripcion, carrera_id, profesor_id, anio, cuatrimestre, horas_semanales, estado) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $id,
@@ -147,6 +153,7 @@ class MateriasController {
                 trim($input['codigo']),
                 $input['descripcion'] ?? null,
                 $input['carrera_id'],
+                $input['profesor_id'] ?? null,
                 $input['anio'],
                 $input['cuatrimestre'] ?? 'anual',
                 $input['horas_semanales'] ?? 4,
@@ -198,7 +205,7 @@ class MateriasController {
         try {
             $stmt = $this->db->prepare("
                 UPDATE materias 
-                SET nombre = ?, codigo = ?, descripcion = ?, carrera_id = ?, anio = ?, 
+                SET nombre = ?, codigo = ?, descripcion = ?, carrera_id = ?, profesor_id = ?, anio = ?, 
                     cuatrimestre = ?, horas_semanales = ?, estado = ?, updated_at = CURRENT_TIMESTAMP 
                 WHERE id = ?
             ");
@@ -207,6 +214,7 @@ class MateriasController {
                 trim($input['codigo']),
                 $input['descripcion'] ?? null,
                 $input['carrera_id'],
+                $input['profesor_id'] ?? null,
                 $input['anio'],
                 $input['cuatrimestre'] ?? 'anual',
                 $input['horas_semanales'] ?? 4,

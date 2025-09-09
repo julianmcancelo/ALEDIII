@@ -10,6 +10,9 @@ export interface Materia {
   descripcion?: string;
   carrera_id: string;
   carrera_nombre?: string;
+  profesor_id?: string;
+  profesor_nombre?: string;
+  profesor_email?: string;
   anio: number;
   cuatrimestre: '1' | '2' | 'anual';
   horas_semanales: number;
@@ -23,6 +26,7 @@ export interface CrearMateriaRequest {
   codigo: string;
   descripcion?: string;
   carrera_id: string;
+  profesor_id?: string;
   anio: number;
   cuatrimestre?: '1' | '2' | 'anual';
   horas_semanales?: number;

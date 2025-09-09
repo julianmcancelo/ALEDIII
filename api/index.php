@@ -19,6 +19,7 @@ require_once 'controllers/AuthController.php';
 require_once 'controllers/NewsletterController.php';
 require_once 'controllers/CarrerasController.php';
 require_once 'controllers/MateriasController.php';
+require_once 'controllers/ProfesoresController.php';
 
 // Obtener la ruta solicitada
 $request_uri = $_SERVER['REQUEST_URI'];
@@ -123,6 +124,21 @@ try {
         case preg_match('/^\/materias\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'DELETE':
             $controller = new MateriasController();
             $controller->deleteMateria($matches[1]);
+            break;
+
+        // Rutas de profesores
+        case preg_match('/^\/profesores$/', $path) && $method === 'GET':
+            $controller = new ProfesoresController();
+            $controller->getProfesores();
+            break;
+
+        case preg_match('/^\/profesores\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'GET':
+            $controller = new ProfesoresController();
+            if (isset($_GET['materias'])) {
+                $controller->getMateriasByProfesor($matches[1]);
+            } else {
+                $controller->getProfesorById($matches[1]);
+            }
             break;
 
         // Rutas de newsletter
