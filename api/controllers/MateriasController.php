@@ -5,7 +5,8 @@ class MateriasController {
     private $db;
 
     public function __construct() {
-        $this->db = getConnection();
+        $database = new Database();
+        $this->db = $database->pdo;
     }
 
     public function getMaterias() {
