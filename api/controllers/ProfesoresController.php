@@ -11,8 +11,22 @@ class ProfesoresController {
 
     public function getProfesores() {
         try {
+            // Primero verificar qué columnas existen
+            $stmt = $this->db->prepare("SHOW COLUMNS FROM usuarios");
+            $stmt->execute();
+            $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            // Construir query dinámicamente basado en columnas existentes
+            $selectFields = "id, name, email, created_at";
+            if (in_array('especialidad', $columns)) {
+                $selectFields .= ", especialidad";
+            }
+            if (in_array('departamento', $columns)) {
+                $selectFields .= ", departamento";
+            }
+            
             $stmt = $this->db->prepare("
-                SELECT id, name, email, especialidad, departamento, created_at
+                SELECT $selectFields
                 FROM usuarios 
                 WHERE role = 'profesor' 
                 ORDER BY name
@@ -25,14 +39,28 @@ class ProfesoresController {
         } catch (PDOException $e) {
             error_log("Error en getProfesores: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['error' => 'Error al obtener profesores']);
+            echo json_encode(['error' => 'Error al obtener profesores', 'details' => $e->getMessage()]);
         }
     }
 
     public function getProfesorById($id) {
         try {
+            // Verificar qué columnas existen
+            $stmt = $this->db->prepare("SHOW COLUMNS FROM usuarios");
+            $stmt->execute();
+            $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            // Construir query dinámicamente
+            $selectFields = "id, name, email, created_at";
+            if (in_array('especialidad', $columns)) {
+                $selectFields .= ", especialidad";
+            }
+            if (in_array('departamento', $columns)) {
+                $selectFields .= ", departamento";
+            }
+            
             $stmt = $this->db->prepare("
-                SELECT id, name, email, especialidad, departamento, created_at
+                SELECT $selectFields
                 FROM usuarios 
                 WHERE id = ? AND role = 'profesor'
             ");
@@ -49,7 +77,7 @@ class ProfesoresController {
         } catch (PDOException $e) {
             error_log("Error en getProfesorById: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['error' => 'Error al obtener profesor']);
+            echo json_encode(['error' => 'Error al obtener profesor', 'details' => $e->getMessage()]);
         }
     }
 
