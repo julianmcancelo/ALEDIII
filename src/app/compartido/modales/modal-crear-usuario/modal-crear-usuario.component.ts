@@ -303,14 +303,95 @@ import Swal from 'sweetalert2';
                 </div>
               </div>
 
-              <div *ngIf="tipoUsuario === 'profesor'" class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
-                  <input 
-                    type="tel" 
-                    formControlName="telefono" 
-                    placeholder="+54 11 1234-5678"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              <div *ngIf="tipoUsuario === 'profesor'" class="space-y-6">
+                
+                <!-- Sección: Datos Profesionales -->
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-green-800 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    Información Profesional
+                  </h4>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Especialidad *</label>
+                      <select 
+                        formControlName="especialidad"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        [class.border-red-500]="formulario.get('especialidad')?.invalid && formulario.get('especialidad')?.touched">
+                        <option value="">Seleccionar especialidad</option>
+                        <option value="Programación">Programación</option>
+                        <option value="Redes y Sistemas">Redes y Sistemas</option>
+                        <option value="Base de Datos">Base de Datos</option>
+                        <option value="Desarrollo Web">Desarrollo Web</option>
+                        <option value="Electrónica">Electrónica</option>
+                        <option value="Matemática">Matemática</option>
+                        <option value="Física">Física</option>
+                        <option value="Inglés Técnico">Inglés Técnico</option>
+                        <option value="Gestión de Proyectos">Gestión de Proyectos</option>
+                        <option value="Otra">Otra</option>
+                      </select>
+                      <div *ngIf="formulario.get('especialidad')?.hasError('required') && formulario.get('especialidad')?.touched" 
+                           class="mt-1 text-sm text-red-600">
+                        La especialidad es requerida
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
+                      <select 
+                        formControlName="departamento"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        <option value="">Seleccionar departamento</option>
+                        <option value="Informática">Informática</option>
+                        <option value="Electrónica">Electrónica</option>
+                        <option value="Ciencias Básicas">Ciencias Básicas</option>
+                        <option value="Humanidades">Humanidades</option>
+                        <option value="Gestión">Gestión</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección: Contacto -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-blue-800 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                    Datos de Contacto
+                  </h4>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono *</label>
+                      <input 
+                        type="tel" 
+                        formControlName="telefono" 
+                        placeholder="+54 11 1234-5678"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        [class.border-red-500]="formulario.get('telefono')?.invalid && formulario.get('telefono')?.touched">
+                      <div *ngIf="formulario.get('telefono')?.hasError('required') && formulario.get('telefono')?.touched" 
+                           class="mt-1 text-sm text-red-600">
+                        El teléfono es requerido
+                      </div>
+                      <div *ngIf="formulario.get('telefono')?.hasError('pattern') && formulario.get('telefono')?.touched" 
+                           class="mt-1 text-sm text-red-600">
+                        Formato de teléfono inválido
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">DNI</label>
+                      <input 
+                        type="text" 
+                        formControlName="dni" 
+                        placeholder="12345678"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -429,6 +510,7 @@ export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
       
       // Datos profesor/admin
       telefono: [''],
+      especialidad: [''],
       departamento: ['']
     });
   }
@@ -461,6 +543,7 @@ export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
       
     } else if (this.tipoUsuario === 'profesor') {
       this.formulario.get('telefono')?.setValidators([Validators.required, Validators.pattern(/^[\+]?[0-9\s\-\(\)]{10,15}$/)]);
+      this.formulario.get('especialidad')?.setValidators([Validators.required]);
       
     } else if (this.tipoUsuario === 'admin') {
       this.formulario.get('departamento')?.setValidators([Validators.required]);
