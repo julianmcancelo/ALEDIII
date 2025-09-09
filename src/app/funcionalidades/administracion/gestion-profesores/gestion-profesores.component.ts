@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { ProfesoresService, Profesor } from '../../../nucleo/servicios/profesores.service';
 import { UserService, Usuario } from '../../../nucleo/servicios/user.service';
+import { CarrerasService, Carrera } from '../../../nucleo/servicios/carreras.service';
 import { ModalCrearUsuarioComponent } from '../../../compartido/modales/modal-crear-usuario/modal-crear-usuario.component';
 import Swal from 'sweetalert2';
 
@@ -36,7 +37,7 @@ import Swal from 'sweetalert2';
         <!-- Filtros y búsqueda -->
         <div class="bg-white rounded-lg shadow-lg mb-6">
           <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Buscar por nombre</label>
                 <input 
@@ -61,6 +62,16 @@ import Swal from 'sweetalert2';
                   <option value="Matemática">Matemática</option>
                   <option value="Física">Física</option>
                   <option value="Inglés Técnico">Inglés Técnico</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Carrera</label>
+                <select 
+                  [(ngModel)]="filtroCarrera"
+                  (change)="aplicarFiltros()"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <option value="">Todas las carreras</option>
+                  <option *ngFor="let carrera of carreras" [value]="carrera.id">{{carrera.nombre}}</option>
                 </select>
               </div>
               <div>
@@ -193,19 +204,23 @@ import Swal from 'sweetalert2';
 export class GestionProfesoresComponent implements OnInit {
   private profesoresService = inject(ProfesoresService);
   private userService = inject(UserService);
+  private carrerasService = inject(CarrerasService);
 
   profesores: Profesor[] = [];
   profesoresFiltrados: Profesor[] = [];
+  carreras: Carrera[] = [];
   cargando = false;
   mostrarModalCrear = false;
 
   // Filtros
   filtroNombre = '';
   filtroEspecialidad = '';
+  filtroCarrera = '';
   filtroDepartamento = '';
 
   ngOnInit() {
     this.cargarProfesores();
+    this.cargarCarreras();
   }
 
   cargarProfesores() {
@@ -224,6 +239,17 @@ export class GestionProfesoresComponent implements OnInit {
     });
   }
 
+  cargarCarreras() {
+    this.carrerasService.getCarreras().subscribe({
+      next: (carreras) => {
+        this.carreras = carreras.filter(c => c.estado === 'activa');
+      },
+      error: (error) => {
+        console.error('Error al cargar carreras:', error);
+      }
+    });
+  }
+
   aplicarFiltros() {
     this.profesoresFiltrados = this.profesores.filter(profesor => {
       const coincideNombre = !this.filtroNombre || 
@@ -235,7 +261,15 @@ export class GestionProfesoresComponent implements OnInit {
       const coincideDepartamento = !this.filtroDepartamento || 
         profesor.departamento === this.filtroDepartamento;
 
-      return coincideNombre && coincideEspecialidad && coincideDepartamento;
+      // Filtro por carrera - verificar si el profesor tiene materias en esa carrera
+      let coincideCarrera = true;
+      if (this.filtroCarrera) {
+        // Si hay filtro de carrera, necesitamos verificar las materias del profesor
+        // Por ahora mostramos todos hasta que se implemente la carga de materias por profesor
+        coincideCarrera = true;
+      }
+
+      return coincideNombre && coincideEspecialidad && coincideDepartamento && coincideCarrera;
     });
   }
 
@@ -264,12 +298,39 @@ export class GestionProfesoresComponent implements OnInit {
         if (materias.length === 0) {
           Swal.fire('Info', `${profesor.name} no tiene materias asignadas`, 'info');
         } else {
-          const listaMaterias = materias.map(m => `• ${m.nombre} (${m.carrera_nombre})`).join('<br>');
+          // Agrupar materias por carrera
+          const materiasPorCarrera = materias.reduce((acc: any, materia: any) => {
+            const carrera = materia.carrera_nombre || 'Sin carrera';
+            if (!acc[carrera]) {
+              acc[carrera] = [];
+            }
+            acc[carrera].push(materia);
+            return acc;
+          }, {});
+
+          // Crear HTML organizado por carreras
+          let html = '';
+          Object.keys(materiasPorCarrera).forEach(carrera => {
+            html += `<div class="mb-4">
+              <h4 class="font-semibold text-lg text-blue-600 mb-2">${carrera}</h4>
+              <ul class="list-disc list-inside ml-4">`;
+            
+            materiasPorCarrera[carrera].forEach((materia: any) => {
+              html += `<li class="text-sm mb-1">
+                <span class="font-medium">${materia.nombre}</span>
+                <span class="text-gray-600"> - ${materia.anio}° año, ${materia.cuatrimestre}° cuatrimestre</span>
+              </li>`;
+            });
+            
+            html += '</ul></div>';
+          });
+
           Swal.fire({
-            title: `Materias de ${profesor.name}`,
-            html: listaMaterias,
+            title: `Materias asignadas a ${profesor.name}`,
+            html: html,
             icon: 'info',
-            confirmButtonText: 'Cerrar'
+            confirmButtonText: 'Cerrar',
+            width: '600px'
           });
         }
       },

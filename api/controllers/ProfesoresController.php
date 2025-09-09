@@ -84,11 +84,11 @@ class ProfesoresController {
     public function getMateriasByProfesor($profesor_id) {
         try {
             $stmt = $this->db->prepare("
-                SELECT m.*, c.nombre as carrera_nombre 
+                SELECT m.*, c.nombre as carrera_nombre, c.id as carrera_id
                 FROM materias m 
                 LEFT JOIN carreras c ON m.carrera_id = c.id 
                 WHERE m.profesor_id = ? AND m.estado = 'activa' 
-                ORDER BY c.nombre, m.anio, m.nombre
+                ORDER BY c.nombre, m.anio, m.cuatrimestre, m.nombre
             ");
             $stmt->execute([$profesor_id]);
             $materias = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -98,7 +98,28 @@ class ProfesoresController {
         } catch (PDOException $e) {
             error_log("Error en getMateriasByProfesor: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['error' => 'Error al obtener materias del profesor']);
+            echo json_encode(['error' => 'Error al obtener materias del profesor', 'details' => $e->getMessage()]);
+        }
+    }
+
+    public function getProfesoresByCarrera($carrera_id) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT DISTINCT u.id, u.name, u.email, u.especialidad, u.departamento, u.telefono, u.created_at
+                FROM usuarios u
+                INNER JOIN materias m ON u.id = m.profesor_id
+                WHERE u.role = 'profesor' AND m.carrera_id = ? AND m.estado = 'activa'
+                ORDER BY u.name
+            ");
+            $stmt->execute([$carrera_id]);
+            $profesores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json');
+            echo json_encode($profesores);
+        } catch (PDOException $e) {
+            error_log("Error en getProfesoresByCarrera: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['error' => 'Error al obtener profesores por carrera', 'details' => $e->getMessage()]);
         }
     }
 }

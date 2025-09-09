@@ -146,6 +146,13 @@ try {
             }
             break;
 
+        case preg_match('/^\/carreras\/(\d+)\/profesores$/', $path, $matches) && $method === 'GET':
+            $controller = new ProfesoresController();
+            if (isset($matches[1])) {
+                $controller->getProfesoresByCarrera($matches[1]);
+            }
+            break;
+
         // Rutas de newsletter
         case preg_match('/^\/newsletter$/', $path) && $method === 'POST':
             $controller = new NewsletterController();
