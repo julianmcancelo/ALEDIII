@@ -21,22 +21,36 @@ export const routes: Routes = [
     path: 'dashboard',
     loadComponent: () => import('./diseno/panel/dashboard.component').then(c => c.DashboardComponent),
     canActivate: [AuthGuard],
-    children: [{
-      path: '',
-      loadComponent: () => import('./diseno/panel/panel-inicio/dashboard-home.component').then(c => c.DashboardHomeComponent)
-    }]
-  },
-  {
-    path: 'estudiantes',
-    loadChildren: () => import('./funcionalidades/estudiantes/students-routing.module').then(m => m.StudentsRoutingModule),
-    canActivate: [AuthGuard, RoleGuard],
-    data: { requiredRoles: ['admin', 'secretario'] }
-  },
-  {
-    path: 'gestion-usuarios',
-    loadComponent: () => import('./funcionalidades/administracion/gestion-usuarios/gestion-usuarios.component').then(c => c.GestionUsuariosComponent),
-    canActivate: [AuthGuard, RoleGuard],
-    data: { requiredRoles: ['admin'] }
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./diseno/panel/panel-inicio/dashboard-home.component').then(c => c.DashboardHomeComponent)
+      },
+      {
+        path: 'estudiantes',
+        loadChildren: () => import('./funcionalidades/estudiantes/students-routing.module').then(m => m.StudentsRoutingModule),
+        canActivate: [AuthGuard, RoleGuard],
+        data: { requiredRoles: ['admin', 'profesor'] } 
+      },
+      {
+        path: 'gestion-usuarios',
+        loadComponent: () => import('./funcionalidades/administracion/gestion-usuarios/gestion-usuarios.component').then(c => c.GestionUsuariosComponent),
+        canActivate: [AuthGuard, RoleGuard],
+        data: { requiredRoles: ['admin'] }
+      },
+      {
+        path: 'gestion-carreras',
+        loadComponent: () => import('./funcionalidades/administracion/gestion-carreras/gestion-carreras.component').then(c => c.GestionCarrerasComponent),
+        canActivate: [AuthGuard, RoleGuard],
+        data: { requiredRoles: ['admin'] }
+      },
+      {
+        path: 'gestion-materias',
+        loadComponent: () => import('./funcionalidades/administracion/gestion-materias/gestion-materias.component').then(c => c.GestionMateriasComponent),
+        canActivate: [AuthGuard, RoleGuard],
+        data: { requiredRoles: ['admin'] }
+      }
+    ]
   },
   {
     path: '**',

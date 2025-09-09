@@ -11,6 +11,18 @@ export interface User {
   name: string;
   role: 'admin' | 'student' | 'profesor';
   password?: string;
+  dni?: string;
+  legajo?: string;
+  carrera?: string;
+  especialidad?: string;
+  telefono?: string;
+  departamento?: string;
+  created_at?: string;
+}
+
+export interface CheckUsersResponse {
+  hasUsers: boolean;
+  count: number;
 }
 
 @Injectable({
@@ -79,5 +91,23 @@ export class AuthService {
 
   isStudent(): boolean {
     return this.hasRole('student');
+  }
+
+  checkUsersExist(): Observable<CheckUsersResponse> {
+    return this.http.get<CheckUsersResponse>(`${this.apiUrl}?check=true`).pipe(
+      catchError(error => {
+        console.error('Error checking users:', error);
+        return of({ hasUsers: true, count: 0 });
+      })
+    );
+  }
+
+  createUser(userData: Partial<User>): Observable<User> {
+    return this.http.post<User>(this.apiUrl, userData).pipe(
+      catchError(error => {
+        console.error('Error creating user:', error);
+        throw error;
+      })
+    );
   }
 }

@@ -1,82 +1,80 @@
 <?php
+// AuthController mínimo que funciona con la tabla actual
+require_once 'config/database.php';
+
 class AuthController {
     private $db;
 
     public function __construct() {
         $database = new Database();
-        $this->db = $database->connect();
+        $this->db = $database->pdo;
     }
 
-    public function login() {
-        $input = json_decode(file_get_contents('php://input'), true);
-        
-        if (!isset($input['email']) || !isset($input['password'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Email y contraseña requeridos']);
-            return;
-        }
-
-        $email = $input['email'];
-        $password = $input['password'];
-
+    public function checkUsersExist() {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM usuarios WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
-
-            if ($user && password_verify($password, $user['password_hash'])) {
-                // Remover password_hash de la respuesta
-                unset($user['password_hash']);
-                echo json_encode($user);
-            } else {
-                http_response_code(401);
-                echo json_encode(['error' => 'Credenciales inválidas']);
-            }
+            $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM usuarios");
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            header('Content-Type: application/json');
+            echo json_encode(['hasUsers' => $result['count'] > 0, 'count' => $result['count']]);
         } catch (PDOException $e) {
+            error_log("Error en checkUsersExist: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['error' => 'Error de base de datos']);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Error al verificar usuarios']);
         }
     }
 
-    public function getUserByCredentials() {
-        $email = $_GET['email'] ?? '';
-        $password = $_GET['password'] ?? '';
-
-        if (empty($email) || empty($password)) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Email y contraseña requeridos']);
-            return;
-        }
-
+    public function getAllUsers() {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM usuarios WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
+            $role = $_GET['role'] ?? null;
 
-            if ($user && password_verify($password, $user['password_hash'])) {
-                // Remover password_hash de la respuesta
-                unset($user['password_hash']);
-                echo json_encode([$user]); // Retornar array para compatibilidad con MockAPI
-            } else {
-                echo json_encode([]); // Array vacío si no encuentra usuario
+            $query = "
+                SELECT 
+                    u.*, 
+                    c.nombre as carrera_nombre
+                FROM 
+                    usuarios u
+                LEFT JOIN 
+                    carreras c ON u.carrera_id = c.id
+            ";
+            
+            $params = [];
+            if ($role) {
+                $query .= " WHERE u.role = ?";
+                $params[] = $role;
             }
+
+            $query .= " ORDER BY u.created_at DESC";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->execute($params);
+            $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            if ($usuarios === false) {
+                $usuarios = [];
+            }
+            
+            header('Content-Type: application/json');
+            echo json_encode($usuarios);
         } catch (PDOException $e) {
+            error_log("Error en getAllUsers: " . $e->getMessage());
             http_response_code(500);
-            echo json_encode(['error' => 'Error de base de datos']);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Error al obtener usuarios: ' . $e->getMessage()]);
         }
     }
 
     public function createUser() {
         $input = json_decode(file_get_contents('php://input'), true);
         
-        // Validar datos requeridos
         if (!isset($input['email']) || !isset($input['name']) || !isset($input['role']) || !isset($input['password'])) {
             http_response_code(400);
             echo json_encode(['error' => 'Email, nombre, rol y contraseña son requeridos']);
             return;
         }
 
-        // Validar rol
         $validRoles = ['admin', 'student', 'profesor'];
         if (!in_array($input['role'], $validRoles)) {
             http_response_code(400);
@@ -84,7 +82,6 @@ class AuthController {
             return;
         }
 
-        // Validar email
         if (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
             http_response_code(400);
             echo json_encode(['error' => 'Email inválido']);
@@ -95,45 +92,54 @@ class AuthController {
             $id = $this->generateUUID();
             $hashedPassword = password_hash($input['password'], PASSWORD_DEFAULT);
             
-            // Preparar campos adicionales según el rol
-            $dni = isset($input['dni']) ? $input['dni'] : null;
-            $carrera = isset($input['carrera']) ? $input['carrera'] : null;
-            $especialidad = isset($input['especialidad']) ? $input['especialidad'] : null;
-            $telefono = isset($input['telefono']) ? $input['telefono'] : null;
-            $departamento = isset($input['departamento']) ? $input['departamento'] : null;
-            
-            $stmt = $this->db->prepare("
-                INSERT INTO usuarios (id, email, name, role, password_hash, dni, carrera, especialidad, telefono, departamento) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-            
-            $stmt->execute([
-                $id,
-                $input['email'],
-                $input['name'],
-                $input['role'],
-                $hashedPassword,
-                $dni,
-                $carrera,
-                $especialidad,
-                $telefono,
-                $departamento
-            ]);
+            try {
+                $stmt = $this->db->prepare("INSERT INTO usuarios (
+                    id, email, name, apellidos, role, password_hash, 
+                    dni, legajo, carrera_id, telefono, departamento,
+                    fechaNacimiento, fechaInscripcion, estado, 
+                    calle, ciudad, provincia, codigoPostal,
+                    contacto_emergencia_nombre, contacto_emergencia_telefono, contacto_emergencia_parentesco
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                
+                $stmt->execute([
+                    $id,
+                    $input['email'],
+                    $input['name'],
+                    $input['apellidos'] ?? null,
+                    $input['role'],
+                    $hashedPassword,
+                    $input['dni'] ?? null,
+                    $input['legajo'] ?? null,
+                    $input['carrera_id'] ?? null,
+                    $input['telefono'] ?? null,
+                    $input['departamento'] ?? null,
+                    $input['fechaNacimiento'] ?? null,
+                    $input['fechaInscripcion'] ?? null,
+                    $input['estado'] ?? 'activo',
+                    $input['calle'] ?? null,
+                    $input['ciudad'] ?? null,
+                    $input['provincia'] ?? null,
+                    $input['codigoPostal'] ?? null,
+                    $input['contacto_emergencia_nombre'] ?? null,
+                    $input['contacto_emergencia_telefono'] ?? null,
+                    $input['contacto_emergencia_parentesco'] ?? null
+                ]);
 
-            // Devolver el usuario creado sin la contraseña
-            header('Content-Type: application/json');
-            echo json_encode([
-                'id' => $id,
-                'email' => $input['email'],
-                'name' => $input['name'],
-                'role' => $input['role'],
-                'dni' => $dni,
-                'carrera' => $carrera,
-                'especialidad' => $especialidad,
-                'telefono' => $telefono,
-                'departamento' => $departamento,
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'id' => $id,
+                    'email' => $input['email'],
+                    'name' => $input['name'],
+                    'apellidos' => $input['apellidos'] ?? null,
+                    'role' => $input['role'],
+                    'created_at' => date('Y-m-d H:i:s')
+                ]);
+            } catch (PDOException $e) {
+                error_log("Error en createUser: " . $e->getMessage());
+                http_response_code(500);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Error al crear usuario: ' . $e->getMessage()]);
+            }
         } catch (PDOException $e) {
             error_log("Error en createUser: " . $e->getMessage());
             http_response_code(500);
@@ -142,24 +148,114 @@ class AuthController {
         }
     }
 
-    public function getAllUsers() {
+    public function login() {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($input['email']) || !isset($input['password'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Email y contraseña son requeridos']);
+            return;
+        }
+
         try {
-            $stmt = $this->db->prepare("SELECT id, email, name, role, dni, carrera, especialidad, telefono, departamento, created_at FROM usuarios ORDER BY created_at DESC");
-            $stmt->execute();
-            $users = $stmt->fetchAll();
-            
-            echo json_encode($users);
+            $stmt = $this->db->prepare("SELECT id, email, name, role, password_hash FROM usuarios WHERE email = ?");
+            $stmt->execute([$input['email']]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user && password_verify($input['password'], $user['password_hash'])) {
+                unset($user['password_hash']);
+                header('Content-Type: application/json');
+                echo json_encode($user);
+            } else {
+                http_response_code(401);
+                echo json_encode(['error' => 'Credenciales inválidas']);
+            }
+        } catch (PDOException $e) {
+            error_log("Error en login: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['error' => 'Error interno del servidor']);
+        }
+    }
+
+    public function getUserByCredentials() {
+        if (!isset($_GET['email']) || !isset($_GET['password'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Email y password son requeridos']);
+            return;
+        }
+
+        try {
+            $stmt = $this->db->prepare("SELECT id, email, name, role, password_hash FROM usuarios WHERE email = ?");
+            $stmt->execute([$_GET['email']]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user && password_verify($_GET['password'], $user['password_hash'])) {
+                unset($user['password_hash']);
+                header('Content-Type: application/json');
+                echo json_encode([$user]); // Devolver array para compatibilidad con AuthService
+            } else {
+                header('Content-Type: application/json');
+                echo json_encode([]); // Array vacío si no encuentra usuario
+            }
         } catch (PDOException $e) {
             http_response_code(500);
-            echo json_encode(['error' => 'Error al obtener usuarios']);
+            echo json_encode(['error' => 'Error al buscar usuario']);
+        }
+    }
+
+    public function updateUser($id) {
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        // Construir la consulta dinámicamente
+        $fields = [];
+        $params = [];
+        
+        // Lista de campos permitidos para actualizar
+        $allowedFields = [
+            'name', 'apellidos', 'email', 'dni', 'legajo', 'carrera_id', 
+            'telefono', 'departamento', 'fechaNacimiento', 'fechaInscripcion', 'estado', 
+            'calle', 'ciudad', 'provincia', 'codigoPostal', 'contacto_emergencia_nombre', 
+            'contacto_emergencia_telefono', 'contacto_emergencia_parentesco'
+        ];
+
+        foreach ($allowedFields as $field) {
+            if (isset($input[$field])) {
+                $fields[] = "`$field` = ?";
+                $params[] = $input[$field];
+            }
+        }
+
+        if (empty($fields)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'No hay campos para actualizar']);
+            return;
+        }
+
+        $params[] = $id; // Agregar el ID al final para el WHERE
+
+        try {
+            $stmt = $this->db->prepare("UPDATE usuarios SET " . implode(', ', $fields) . " WHERE id = ?");
+            $stmt->execute($params);
+
+            if ($stmt->rowCount() > 0) {
+                // Devolver el usuario actualizado
+                $this->getUserById($id);
+            } else {
+                // Si no se afectaron filas, puede ser que no se encontró el usuario o los datos eran los mismos
+                $this->getUserById($id); 
+            }
+        } catch (PDOException $e) {
+            error_log("Error en updateUser: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['error' => 'Error al actualizar usuario: ' . $e->getMessage()]);
         }
     }
 
     public function deleteUser($id) {
         try {
             $stmt = $this->db->prepare("DELETE FROM usuarios WHERE id = ?");
-            $stmt->execute([$id]);
-
+            $result = $stmt->execute([$id]);
+            
             if ($stmt->rowCount() > 0) {
                 echo json_encode(['message' => 'Usuario eliminado correctamente']);
             } else {
@@ -172,29 +268,33 @@ class AuthController {
         }
     }
 
-    public function getAllUsers() {
+    public function getUserById($id) {
         try {
-            $stmt = $this->db->prepare("SELECT id, email, name, role, dni, carrera, especialidad, telefono, departamento, created_at FROM usuarios ORDER BY created_at DESC");
-            $stmt->execute();
-            $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            // Asegurar que siempre devolvemos un array válido
-            if ($usuarios === false) {
-                $usuarios = [];
+            $query = "
+                SELECT 
+                    u.*, 
+                    c.nombre as carrera_nombre
+                FROM 
+                    usuarios u
+                LEFT JOIN 
+                    carreras c ON u.carrera_id = c.id
+                WHERE u.id = ?
+            ";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                header('Content-Type: application/json');
+                echo json_encode($user);
+            } else {
+                http_response_code(404);
+                echo json_encode(['error' => 'Usuario no encontrado']);
             }
-            
-            header('Content-Type: application/json');
-            echo json_encode($usuarios);
         } catch (PDOException $e) {
-            error_log("Error en getAllUsers: " . $e->getMessage());
+            error_log("Error en getUserById: " . $e->getMessage());
             http_response_code(500);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Error al obtener usuarios: ' . $e->getMessage()]);
-        } catch (Exception $e) {
-            error_log("Error general en getAllUsers: " . $e->getMessage());
-            http_response_code(500);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Error interno del servidor']);
+            echo json_encode(['error' => 'Error al obtener usuario']);
         }
     }
 

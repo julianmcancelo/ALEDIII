@@ -163,6 +163,118 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+    
+    // Verificar si existen usuarios en el sistema
+    this.verificarUsuariosExistentes();
+  }
+
+  private verificarUsuariosExistentes() {
+    this.servicioAuth.checkUsersExist().subscribe({
+      next: (response: any) => {
+        if (!response.hasUsers) {
+          this.mostrarRegistroAdmin();
+        }
+      },
+      error: (error: any) => {
+        console.error('Error verificando usuarios:', error);
+      }
+    });
+  }
+
+  private mostrarRegistroAdmin() {
+    Swal.fire({
+      title: 'Configuración Inicial',
+      text: 'No hay usuarios registrados. Crea el primer administrador del sistema.',
+      icon: 'info',
+      showCancelButton: false,
+      confirmButtonText: 'Crear Administrador',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.mostrarFormularioAdmin();
+      }
+    });
+  }
+
+  private mostrarFormularioAdmin() {
+    Swal.fire({
+      title: 'Crear Administrador',
+      html: `
+        <div class="space-y-4">
+          <input id="admin-name" class="swal2-input" placeholder="Nombre completo" required>
+          <input id="admin-email" class="swal2-input" placeholder="Email" type="email" required>
+          <input id="admin-password" class="swal2-input" placeholder="Contraseña" type="password" required>
+          <input id="admin-confirm-password" class="swal2-input" placeholder="Confirmar contraseña" type="password" required>
+        </div>
+      `,
+      showCancelButton: false,
+      confirmButtonText: 'Crear Administrador',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      preConfirm: () => {
+        const name = (document.getElementById('admin-name') as HTMLInputElement).value;
+        const email = (document.getElementById('admin-email') as HTMLInputElement).value;
+        const password = (document.getElementById('admin-password') as HTMLInputElement).value;
+        const confirmPassword = (document.getElementById('admin-confirm-password') as HTMLInputElement).value;
+
+        if (!name || !email || !password || !confirmPassword) {
+          Swal.showValidationMessage('Todos los campos son obligatorios');
+          return false;
+        }
+
+        if (password !== confirmPassword) {
+          Swal.showValidationMessage('Las contraseñas no coinciden');
+          return false;
+        }
+
+        if (password.length < 6) {
+          Swal.showValidationMessage('La contraseña debe tener al menos 6 caracteres');
+          return false;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          Swal.showValidationMessage('Ingresa un email válido');
+          return false;
+        }
+
+        return { name, email, password };
+      }
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        this.crearAdministrador(result.value);
+      }
+    });
+  }
+
+  private crearAdministrador(adminData: any) {
+    const userData = {
+      name: adminData.name,
+      email: adminData.email,
+      password: adminData.password,
+      role: 'admin' as const
+    };
+
+    this.servicioAuth.createUser(userData).subscribe({
+      next: (response: any) => {
+        Swal.fire({
+          icon: 'success',
+          title: '¡Administrador creado!',
+          text: 'El administrador se ha creado exitosamente. Ahora puedes iniciar sesión.',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      },
+      error: (error: any) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo crear el administrador. Intenta nuevamente.'
+        });
+        this.mostrarFormularioAdmin();
+      }
+    });
   }
 
   /**

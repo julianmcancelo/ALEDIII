@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { UserService, Usuario, CrearUsuarioRequest } from '../../../nucleo/servicios/user.service';
 import { AuthService } from '../../../nucleo/servicios/auth.service';
 import { ModalCrearUsuarioComponent, TipoUsuario } from '../../../compartido/modales/modal-crear-usuario/modal-crear-usuario.component';
@@ -91,12 +92,28 @@ import Swal from 'sweetalert2';
                     <div class="flex-1">
                       <h4 class="font-semibold text-gray-800">{{ usuario.name }}</h4>
                       <p class="text-sm text-gray-600">{{ usuario.email }}</p>
+                      
+                      <!-- Información específica por rol -->
+                      <div *ngIf="usuario.role === 'student' && (usuario.dni || usuario.legajo || usuario.carrera_nombre)" class="mt-2 text-xs text-gray-500">
+                        <span *ngIf="usuario.dni" class="block">DNI: {{ usuario.dni }}</span>
+                        <span *ngIf="usuario.legajo" class="block">Legajo: {{ usuario.legajo }}</span>
+                        <span *ngIf="usuario.carrera_nombre" class="block">Carrera: {{ usuario.carrera_nombre }}</span>
+                      </div>
+                      
+                      <div *ngIf="usuario.role === 'profesor' && usuario.telefono" class="mt-2 text-xs text-gray-500">
+                        <span *ngIf="usuario.telefono" class="block">Teléfono: {{ usuario.telefono }}</span>
+                      </div>
+                      
+                      <div *ngIf="usuario.role === 'admin' && usuario.departamento" class="mt-2 text-xs text-gray-500">
+                        <span class="block">Departamento: {{ usuario.departamento }}</span>
+                      </div>
+                      
                       <div class="mt-2">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                               [ngClass]="{
                                 'bg-red-100 text-red-800': usuario.role === 'admin',
-                                'bg-blue-100 text-blue-800': usuario.role === 'profesor',
-                                'bg-green-100 text-green-800': usuario.role === 'student'
+                                'bg-green-100 text-green-800': usuario.role === 'profesor',
+                                'bg-blue-100 text-blue-800': usuario.role === 'student'
                               }">
                           {{ getRoleLabel(usuario.role) }}
                         </span>
@@ -143,10 +160,19 @@ export class GestionUsuariosComponent implements OnInit {
 
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     this.cargarUsuarios();
+    
+    // Verificar si viene con parámetros para abrir modal automáticamente
+    this.route.queryParams.subscribe(params => {
+      if (params['accion'] === 'crear' && params['tipo']) {
+        this.tipoUsuarioSeleccionado = params['tipo'] as TipoUsuario;
+        this.mostrarModal = true;
+      }
+    });
   }
 
   constructor() {}

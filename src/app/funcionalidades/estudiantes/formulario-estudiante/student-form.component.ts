@@ -13,6 +13,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { StudentService } from '../../../nucleo/servicios/student.service';
+import { CarrerasService, Carrera } from '../../../nucleo/servicios/carreras.service';
 import { Estudiante, CrearEstudianteRequest } from '../../../nucleo/modelos/student.model';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
@@ -149,17 +150,15 @@ import Swal from 'sweetalert2';
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Carrera</label>
                     <select 
-                      formControlName="carrera"
+                      formControlName="carrera_id"
                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      [class.border-red-500]="formularioEstudiante.get('carrera')?.invalid && formularioEstudiante.get('carrera')?.touched">
+                      [class.border-red-500]="formularioEstudiante.get('carrera_id')?.invalid && formularioEstudiante.get('carrera_id')?.touched">
                       <option value="">Seleccionar carrera</option>
-                      <option value="Ingeniería en Sistemas">Ingeniería en Sistemas</option>
-                      <option value="Ingeniería Industrial">Ingeniería Industrial</option>
-                      <option value="Licenciatura en Administración">Licenciatura en Administración</option>
-                      <option value="Tecnicatura en Programación">Tecnicatura en Programación</option>
-                      <option value="Diseño Gráfico">Diseño Gráfico</option>
+                      <option *ngFor="let carrera of carreras" [value]="carrera.id">
+                        {{carrera.nombre}}
+                      </option>
                     </select>
-                    <div *ngIf="formularioEstudiante.get('carrera')?.hasError('required') && formularioEstudiante.get('carrera')?.touched" 
+                    <div *ngIf="formularioEstudiante.get('carrera_id')?.hasError('required') && formularioEstudiante.get('carrera_id')?.touched" 
                          class="mt-1 text-sm text-red-600">
                       La carrera es requerida
                     </div>
@@ -272,11 +271,13 @@ export class FormularioEstudianteComponent implements OnInit {
   formularioEstudiante: FormGroup;
   esEdicion = false;
   estudianteId: string | null = null;
+  carreras: Carrera[] = [];
 
   /** Builder para la creación del formulario reactivo */
   private fb = inject(FormBuilder);
   /** Servicio para gestionar operaciones con estudiantes */
   private servicioEstudiante = inject(StudentService);
+  private carrerasService = inject(CarrerasService);
   /** Router para navegación entre páginas */
   private router = inject(Router);
   /** Servicio para acceder a parámetros de la ruta */
@@ -291,6 +292,7 @@ export class FormularioEstudianteComponent implements OnInit {
    * y carga los datos del estudiante si es necesario
    */
   ngOnInit(): void {
+    this.cargarCarreras();
     this.estudianteId = this.ruta.snapshot.paramMap.get('id');
     if (this.estudianteId) {
       this.esEdicion = true;
@@ -303,7 +305,7 @@ export class FormularioEstudianteComponent implements OnInit {
           dni: estudiante.dni,
           fechaNacimiento: this.formatearFecha(estudiante.fechaNacimiento),
           legajo: estudiante.legajo,
-          carrera: estudiante.carrera,
+          carrera_id: estudiante.carrera_id,
           fechaInscripcion: this.formatearFecha(estudiante.fechaInscripcion),
           estado: estudiante.estado,
           direccion: {
@@ -326,7 +328,7 @@ export class FormularioEstudianteComponent implements OnInit {
       dni: ['', [Validators.required]],
       fechaNacimiento: ['', [Validators.required]],
       legajo: ['', [Validators.required]],
-      carrera: ['', [Validators.required]],
+      carrera_id: ['', [Validators.required]],
       fechaInscripcion: ['', [Validators.required]],
       estado: ['activo'],
       direccion: this.fb.group({
@@ -381,6 +383,12 @@ export class FormularioEstudianteComponent implements OnInit {
   /**
    * Cancela la operación actual y vuelve a la lista de estudiantes
    */
+  cargarCarreras(): void {
+    this.carrerasService.getCarreras().subscribe(carreras => {
+      this.carreras = carreras;
+    });
+  }
+
   cancelar(): void {
     this.router.navigate(['/estudiantes']);
   }

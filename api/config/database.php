@@ -4,7 +4,11 @@ class Database {
     private $dbname = 'jcancelo_aled3';
     private $username = 'jcancelo_aled3';
     private $password = 'feeltehsky1';
-    private $pdo;
+    public $pdo;
+
+    public function __construct() {
+        $this->connect();
+    }
 
     public function connect() {
         if ($this->pdo === null) {
@@ -17,14 +21,13 @@ class Database {
                 $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             } catch(PDOException $e) {
-                die("Error de conexión: " . $e->getMessage());
+                http_response_code(500);
+                echo json_encode(['error' => 'Error de conexión a la base de datos: ' . $e->getMessage()]);
+                exit();
             }
         }
         return $this->pdo;
     }
 
-    public function getConnection() {
-        return $this->connect();
-    }
 }
 ?>

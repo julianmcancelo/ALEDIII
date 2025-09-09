@@ -1,7 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService, CrearUsuarioRequest } from '../../../nucleo/servicios/user.service';
+import { CarrerasService, Carrera } from '../../../nucleo/servicios/carreras.service';
 import Swal from 'sweetalert2';
 
 export type TipoUsuario = 'student' | 'profesor' | 'admin';
@@ -107,41 +108,201 @@ export type TipoUsuario = 'student' | 'profesor' | 'admin';
               </div>
 
               <!-- Campos específicos por rol -->
-              <div *ngIf="tipoUsuario === 'student'" class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">DNI</label>
-                  <input 
-                    type="text" 
-                    formControlName="dni" 
-                    placeholder="12345678"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    [class.border-red-500]="formulario.get('dni')?.invalid && formulario.get('dni')?.touched">
-                </div>
+              <div *ngIf="tipoUsuario === 'student'" class="space-y-6">
                 
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Carrera</label>
-                  <select 
-                    formControlName="carrera"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">Seleccionar carrera</option>
-                    <option value="Técnico en Informática">Técnico en Informática</option>
-                    <option value="Técnico en Electrónica">Técnico en Electrónica</option>
-                    <option value="Técnico en Mecánica">Técnico en Mecánica</option>
-                    <option value="Técnico en Administración">Técnico en Administración</option>
-                  </select>
+                <!-- Sección: Datos Personales -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-blue-800 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Datos Personales
+                  </h4>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Apellidos</label>
+                      <input 
+                        type="text" 
+                        formControlName="apellidos" 
+                        placeholder="García López"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">DNI *</label>
+                      <input 
+                        type="text" 
+                        formControlName="dni" 
+                        placeholder="12345678"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        [class.border-red-500]="formulario.get('dni')?.invalid && formulario.get('dni')?.touched">
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento</label>
+                      <input 
+                        type="date" 
+                        formControlName="fechaNacimiento"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                      <select 
+                        formControlName="estado"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                        <option value="graduado">Graduado</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección: Datos Académicos -->
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-green-800 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                    </svg>
+                    Datos Académicos
+                  </h4>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Legajo *</label>
+                      <input 
+                        type="text" 
+                        formControlName="legajo" 
+                        placeholder="EST-2024-001"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Carrera *</label>
+                      <select 
+                        formControlName="carrera_id"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        <option value="">Seleccionar carrera</option>
+                        <option *ngFor="let carrera of carreras" [value]="carrera.id">
+                          {{carrera.nombre}} ({{carrera.duracion_anios}} años)
+                        </option>
+                      </select>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Inscripción</label>
+                      <input 
+                        type="date" 
+                        formControlName="fechaInscripcion"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección: Dirección -->
+                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-purple-800 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Dirección
+                  </h4>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Calle y Número</label>
+                      <input 
+                        type="text" 
+                        formControlName="calle" 
+                        placeholder="Av. Mitre 1234"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Ciudad</label>
+                      <input 
+                        type="text" 
+                        formControlName="ciudad" 
+                        placeholder="Avellaneda"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Provincia</label>
+                      <select 
+                        formControlName="provincia"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="">Seleccionar provincia</option>
+                        <option value="Buenos Aires">Buenos Aires</option>
+                        <option value="CABA">Ciudad Autónoma de Buenos Aires</option>
+                        <option value="Córdoba">Córdoba</option>
+                        <option value="Santa Fe">Santa Fe</option>
+                        <option value="Mendoza">Mendoza</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Código Postal</label>
+                      <input 
+                        type="text" 
+                        formControlName="codigoPostal" 
+                        placeholder="1870"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección: Contacto de Emergencia -->
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-orange-800 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                    Contacto de Emergencia
+                  </h4>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
+                      <input 
+                        type="text" 
+                        formControlName="contacto_emergencia_nombre" 
+                        placeholder="María García"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                      <input 
+                        type="tel" 
+                        formControlName="contacto_emergencia_telefono" 
+                        placeholder="+54 11 1234-5678"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Parentesco</label>
+                      <select 
+                        formControlName="contacto_emergencia_parentesco"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="">Seleccionar</option>
+                        <option value="Madre">Madre</option>
+                        <option value="Padre">Padre</option>
+                        <option value="Hermano/a">Hermano/a</option>
+                        <option value="Abuelo/a">Abuelo/a</option>
+                        <option value="Tío/a">Tío/a</option>
+                        <option value="Tutor/a">Tutor/a</option>
+                        <option value="Otro">Otro</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <div *ngIf="tipoUsuario === 'profesor'" class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Especialidad</label>
-                  <input 
-                    type="text" 
-                    formControlName="especialidad" 
-                    placeholder="Matemáticas, Programación, etc."
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                </div>
-                
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
                   <input 
@@ -232,18 +393,40 @@ export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
 
   formulario: FormGroup;
   cargando = false;
+  carreras: Carrera[] = [];
 
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
+  private carrerasService = inject(CarrerasService);
 
   constructor() {
     this.formulario = this.fb.group({
+      // Datos básicos
       name: ['', [Validators.required]],
+      apellidos: [''],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
+      
+      // Datos específicos estudiante
       dni: [''],
-      carrera: [''],
-      especialidad: [''],
+      legajo: [''],
+      carrera_id: [''],
+      fechaNacimiento: [''],
+      fechaInscripcion: [''],
+      estado: ['activo'],
+      
+      // Dirección
+      calle: [''],
+      ciudad: [''],
+      provincia: [''],
+      codigoPostal: [''],
+      
+      // Contacto de emergencia
+      contacto_emergencia_nombre: [''],
+      contacto_emergencia_telefono: [''],
+      contacto_emergencia_parentesco: [''],
+      
+      // Datos profesor/admin
       telefono: [''],
       departamento: ['']
     });
@@ -252,6 +435,8 @@ export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     // Configurar validaciones específicas por rol
     this.configurarValidaciones();
+    // Cargar carreras disponibles
+    this.cargarCarreras();
   }
 
   ngOnChanges(): void {
@@ -262,32 +447,26 @@ export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
   }
 
   configurarValidaciones(): void {
-    const dniControl = this.formulario.get('dni');
-    const carreraControl = this.formulario.get('carrera');
-    const especialidadControl = this.formulario.get('especialidad');
-    const departamentoControl = this.formulario.get('departamento');
-
-    // Limpiar validaciones previas
-    dniControl?.clearValidators();
-    carreraControl?.clearValidators();
-    especialidadControl?.clearValidators();
-    departamentoControl?.clearValidators();
-
-    // Aplicar validaciones según el tipo de usuario
     if (this.tipoUsuario === 'student') {
-      dniControl?.setValidators([Validators.required]);
-      carreraControl?.setValidators([Validators.required]);
+      // Campos obligatorios para estudiantes
+      this.formulario.get('dni')?.setValidators([Validators.required, Validators.pattern(/^\d{7,8}$/)]);
+      this.formulario.get('legajo')?.setValidators([Validators.required]);
+      this.formulario.get('carrera_id')?.setValidators([Validators.required]);
+      this.formulario.get('apellidos')?.setValidators([Validators.required]);
+      
+      // Validaciones de formato
+      this.formulario.get('codigoPostal')?.setValidators([Validators.pattern(/^\d{4}$/)]);
+      this.formulario.get('contacto_emergencia_telefono')?.setValidators([Validators.pattern(/^[\+]?[0-9\s\-\(\)]{10,15}$/)]);
+      
     } else if (this.tipoUsuario === 'profesor') {
-      especialidadControl?.setValidators([Validators.required]);
+      this.formulario.get('telefono')?.setValidators([Validators.required, Validators.pattern(/^[\+]?[0-9\s\-\(\)]{10,15}$/)]);
+      
     } else if (this.tipoUsuario === 'admin') {
-      departamentoControl?.setValidators([Validators.required]);
+      this.formulario.get('departamento')?.setValidators([Validators.required]);
     }
-
+    
     // Actualizar validaciones
-    dniControl?.updateValueAndValidity();
-    carreraControl?.updateValueAndValidity();
-    especialidadControl?.updateValueAndValidity();
-    departamentoControl?.updateValueAndValidity();
+    this.formulario.updateValueAndValidity();
   }
 
   getTituloModal(): string {
@@ -349,9 +528,25 @@ export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
     this.cargando = true;
     const datosUsuario: CrearUsuarioRequest = {
       name: this.formulario.get('name')?.value,
+      apellidos: this.formulario.get('apellidos')?.value || null,
       email: this.formulario.get('email')?.value,
       password: this.formulario.get('password')?.value,
-      role: this.tipoUsuario
+      role: this.tipoUsuario,
+      dni: this.formulario.get('dni')?.value || null,
+      legajo: this.formulario.get('legajo')?.value || null,
+      carrera_id: this.formulario.get('carrera_id')?.value || null,
+      fechaNacimiento: this.formulario.get('fechaNacimiento')?.value || null,
+      fechaInscripcion: this.formulario.get('fechaInscripcion')?.value || null,
+      estado: this.formulario.get('estado')?.value || 'activo',
+      calle: this.formulario.get('calle')?.value || null,
+      ciudad: this.formulario.get('ciudad')?.value || null,
+      provincia: this.formulario.get('provincia')?.value || null,
+      codigoPostal: this.formulario.get('codigoPostal')?.value || null,
+      contacto_emergencia_nombre: this.formulario.get('contacto_emergencia_nombre')?.value || null,
+      contacto_emergencia_telefono: this.formulario.get('contacto_emergencia_telefono')?.value || null,
+      contacto_emergencia_parentesco: this.formulario.get('contacto_emergencia_parentesco')?.value || null,
+      telefono: this.formulario.get('telefono')?.value || null,
+      departamento: this.formulario.get('departamento')?.value || null
     };
 
     this.userService.crearUsuario(datosUsuario).subscribe({
@@ -366,6 +561,17 @@ export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
         const mensaje = error.error?.error || `No se pudo crear el ${this.tipoUsuario}`;
         Swal.fire('Error', mensaje, 'error');
         this.cargando = false;
+      }
+    });
+  }
+
+  cargarCarreras(): void {
+    this.carrerasService.getCarreras().subscribe({
+      next: (carreras) => {
+        this.carreras = carreras;
+      },
+      error: (error) => {
+        console.error('Error al cargar carreras:', error);
       }
     });
   }

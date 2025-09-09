@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService, User } from '../../../nucleo/servicios/auth.service';
 import { DashboardService, DashboardStats } from '../../../nucleo/servicios/dashboard.service';
+import { UserService, Usuario } from '../../../nucleo/servicios/user.service';
+import { inject } from '@angular/core';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard-home',
@@ -19,11 +22,14 @@ export class DashboardHomeComponent implements OnInit {
     graduados2024: 0
   };
   cargandoStats = true;
+  mostrarModalTipoUsuario = false;
 
-  constructor(
-    private authService: AuthService,
-    private dashboardService: DashboardService
-  ) {}
+  private authService = inject(AuthService);
+  private userService = inject(UserService);
+  private dashboardService = inject(DashboardService);
+  private router = inject(Router);
+
+  constructor() {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
@@ -35,9 +41,11 @@ export class DashboardHomeComponent implements OnInit {
 
   cargarEstadisticas(): void {
     this.cargandoStats = true;
-    this.dashboardService.getEstadisticas().subscribe({
-      next: (estadisticas) => {
-        this.stats = estadisticas;
+    this.userService.getUsuarios().pipe(
+      map((users: Usuario[]) => users.filter(u => u.role === 'student'))
+    ).subscribe({
+      next: (estudiantes: Usuario[]) => {
+        this.stats.estudiantesActivos = estudiantes.length;
         this.cargandoStats = false;
       },
       error: (error) => {
@@ -61,5 +69,24 @@ export class DashboardHomeComponent implements OnInit {
       'student': 'Estudiante'
     };
     return role ? labels[role] : '';
+  }
+
+  abrirModalTipoUsuario(): void {
+    this.mostrarModalTipoUsuario = true;
+  }
+
+  cerrarModalTipoUsuario(): void {
+    this.mostrarModalTipoUsuario = false;
+  }
+
+  crearTipoUsuario(tipo: 'student' | 'profesor' | 'admin'): void {
+    this.cerrarModalTipoUsuario();
+    this.router.navigate(['/gestion-usuarios'], { 
+      queryParams: { tipo: tipo, accion: 'crear' } 
+    });
+  }
+
+  navegarA(ruta: string): void {
+    this.router.navigate([ruta]);
   }
 }

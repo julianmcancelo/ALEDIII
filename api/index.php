@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Incluir archivos necesarios
 require_once 'config/database.php';
 require_once 'controllers/AuthController.php';
-require_once 'controllers/StudentController.php';
 require_once 'controllers/NewsletterController.php';
+require_once 'controllers/CarrerasController.php';
 
 // Obtener la ruta solicitada
 $request_uri = $_SERVER['REQUEST_URI'];
@@ -38,6 +38,8 @@ try {
             $controller = new AuthController();
             if (isset($_GET['email']) && isset($_GET['password'])) {
                 $controller->getUserByCredentials();
+            } elseif (isset($_GET['check'])) {
+                $controller->checkUsersExist();
             } else {
                 $controller->getAllUsers();
             }
@@ -48,35 +50,46 @@ try {
             $controller->createUser();
             break;
             
+        case preg_match('/^\/users\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'GET':
+            $controller = new AuthController();
+            $controller->getUserById($matches[1]);
+            break;
+
+        case preg_match('/^\/users\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'PUT':
+            $controller = new AuthController();
+            $controller->updateUser($matches[1]);
+            break;
+
         case preg_match('/^\/users\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'DELETE':
             $controller = new AuthController();
             $controller->deleteUser($matches[1]);
             break;
 
-        // Rutas de estudiantes
-        case preg_match('/^\/students$/', $path) && $method === 'GET':
-            $controller = new StudentController();
-            $controller->getAll();
+
+        // Rutas de carreras
+        case preg_match('/^\/carreras$/', $path) && $method === 'GET':
+            $controller = new CarrerasController();
+            $controller->getCarreras();
             break;
-            
-        case preg_match('/^\/students\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'GET':
-            $controller = new StudentController();
-            $controller->getById($matches[1]);
+
+        case preg_match('/^\/carreras\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'GET':
+            $controller = new CarrerasController();
+            $controller->getCarreraById($matches[1]);
             break;
-            
-        case preg_match('/^\/students$/', $path) && $method === 'POST':
-            $controller = new StudentController();
-            $controller->create();
+
+        case preg_match('/^\/carreras$/', $path) && $method === 'POST':
+            $controller = new CarrerasController();
+            $controller->createCarrera();
             break;
-            
-        case preg_match('/^\/students\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'PUT':
-            $controller = new StudentController();
-            $controller->update($matches[1]);
+
+        case preg_match('/^\/carreras\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'PUT':
+            $controller = new CarrerasController();
+            $controller->updateCarrera($matches[1]);
             break;
-            
-        case preg_match('/^\/students\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'DELETE':
-            $controller = new StudentController();
-            $controller->delete($matches[1]);
+
+        case preg_match('/^\/carreras\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'DELETE':
+            $controller = new CarrerasController();
+            $controller->deleteCarrera($matches[1]);
             break;
 
         // Rutas de newsletter
