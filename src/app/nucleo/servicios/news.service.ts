@@ -1,17 +1,38 @@
-// src/app/core/services/news.service.ts
+/**
+ * @file news.service.ts
+ * @description Servicio para gestionar las operaciones CRUD de noticias con Firebase Firestore
+ * Implementa la gestión de noticias y eventos del instituto
+ * 
+ * TP Final Algoritmos y Estructuras de Datos III - 2025
+ * Alumnos: CANCELO JULIAN - NICOLAS OTERO (Curso 3ra 1RA)
+ * Profesor: Sebastian Saldivar
+ */
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, collectionData, addDoc, doc, updateDoc, deleteDoc, query, where, orderBy } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { News } from '../modelos/news.model';
 
 /**
- * Servicio para gestionar las operaciones CRUD de noticias con Firebase Firestore.
+ * @class NewsService
+ * @description Servicio para gestionar las operaciones CRUD de noticias con Firebase Firestore
+ * Permite crear, leer, actualizar y eliminar noticias y eventos del instituto
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root' // Disponible en toda la aplicación como singleton
 })
 export class NewsService {
+  /**
+   * @property firestore
+   * @description Instancia de Firestore para acceder a la base de datos
+   * Utiliza la API moderna de inyección de dependencias de Angular
+   */
   private firestore: Firestore = inject(Firestore);
+  
+  /**
+   * @property newsCollection
+   * @description Referencia a la colección 'news' en Firestore
+   * Todas las operaciones CRUD se realizan sobre esta colección
+   */
   private newsCollection = collection(this.firestore, 'news');
 
   /**
@@ -63,4 +84,10 @@ export class NewsService {
     const newsDoc = doc(this.firestore, `news/${id}`);
     return deleteDoc(newsDoc);
   }
+  
+  /**
+   * @note Servicio implementado como parte del TP Final
+   * Algoritmos y Estructuras de Datos III - 2025
+   * Alumnos: CANCELO JULIAN - NICOLAS OTERO (Curso 3ra 1RA)
+   */
 }

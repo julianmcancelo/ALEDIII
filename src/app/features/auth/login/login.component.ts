@@ -1,6 +1,13 @@
 // TP Final - Algoritmos y Estructuras de Datos III - 2025
 // Módulo de autenticación para sistema de gestión académica
-// Alumno: Curso 3ra 1RA - CANCELO JULIAN- NICOLAS OTERO
+// Alumnos: Curso 3ra 1RA - CANCELO JULIAN - NICOLAS OTERO
+// Profesor: Sebastian Saldivar
+/**
+ * @file login.component.ts
+ * @description Componente de login para el sistema de gestión académica
+ * Implementa un formulario reactivo para autenticación de usuarios
+ * Utiliza SweetAlert2 para mostrar notificaciones estilizadas
+ */
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,10 +15,15 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../nucleo/servicios/auth.service';
 import Swal from 'sweetalert2'; // Librería para mostrar alertas bonitas
 
+/**
+ * @class LoginComponent
+ * @description Componente para la pantalla de inicio de sesión
+ * Implementado como componente standalone según la arquitectura moderna de Angular 17
+ */
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  standalone: true, // Usa la arquitectura moderna de componentes independientes
+  imports: [CommonModule, ReactiveFormsModule], // Importaciones necesarias para el componente
   template: `
     <div class="min-h-screen bg-gradient-to-b from-blue-900 via-blue-700 to-indigo-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <!-- Botón flotante para credenciales de demo -->
@@ -132,42 +144,88 @@ import Swal from 'sweetalert2'; // Librería para mostrar alertas bonitas
   `,
   styles: []
 })
+/**
+ * Componente principal de login para el sistema académico del Instituto Beltrán
+ * @author CANCELO JULIAN - NICOLAS OTERO (Curso 3ra 1RA)
+ */
 export class LoginComponent {
-  // Formulario reactivo para validación de campos
+  /**
+   * @property formularioLogin
+   * @description Formulario reactivo para validación de campos
+   * Permite validar y gestionar los datos ingresados por el usuario
+   */
   formularioLogin: FormGroup;
   
   // Variables de control de la interfaz
-  ocultarContrasena = true; // Toggle para mostrar/ocultar contraseña
-  cargando = false;         // Estado de carga durante autenticación
-  mostrarCredenciales = false; // Control para panel de credenciales demo
+  /**
+   * @property ocultarContrasena
+   * @description Toggle para mostrar/ocultar contraseña
+   * Inicialmente la contraseña está oculta (true)
+   */
+  ocultarContrasena = true;
+  
+  /**
+   * @property cargando
+   * @description Estado de carga durante autenticación
+   * Controla el spinner y deshabilita botones durante peticiones asíncronas
+   */
+  cargando = false;
+  
+  /**
+   * @property mostrarCredenciales
+   * @description Control para panel de credenciales demo
+   * Permite mostrar u ocultar el panel de usuarios de prueba
+   */
+  mostrarCredenciales = false;
 
-  // Array de usuarios de prueba para demostración
-  // NOTA: En producción estos usuarios no deberían estar hardcodeados
-  // Los incluyo para facilitar las pruebas durante el desarrollo
+  /**
+   * @property usuariosDemo
+   * @description Array de usuarios de prueba para demostración
+   * 
+   * IMPORTANTE:
+   * - En producción estos usuarios no deberían estar hardcodeados
+   * - Los incluimos para facilitar las pruebas durante el desarrollo y presentación
+   * - El profesor Sebastian Saldivar está incluido como uno de los usuarios de prueba
+   */
   usuariosDemo = [
     { email: 'admin@ibeltran.com.ar', password: 'AdminPassword2025!', role: 'Administrador' },
-    { email: 'sebastian.saldivar@ibeltran.com.ar', password: 'ProfeSaldivar2025!', role: 'Profesor' },
+    { email: 'sebastian.saldivar@ibeltran.com.ar', password: 'ProfeSaldivar2025!', role: 'Profesor' }, // Nuestro profesor de AyED III
     { email: 'jose.casalnovo@ibeltran.com.ar', password: 'ProfeCasalnovo2025!', role: 'Profesor' },
     { email: 'gabriela.tajes@ibeltran.com.ar', password: 'ProfeTajes2025!', role: 'Profesor' },
     { email: 'sebastian.ceballos@ibeltran.com.ar', password: 'ProfeCeballos2025!', role: 'Profesor' }
   ];
 
-  // Inyección de dependencias usando el API moderno de Angular
-  private constructorForm = inject(FormBuilder);
-  private servicioAuth = inject(AuthService); // Servicio para autenticación
-  private enrutador = inject(Router); // Para navegación programática
+  /**
+   * @description Inyección de dependencias usando la API moderna de Angular (función inject)
+   * Este enfoque es más limpio y legible que el constructor tradicional con parámetros
+   * Es una característica destacada en versiones recientes de Angular
+   */
+  private constructorForm = inject(FormBuilder);  // Para crear formularios reactivos
+  private servicioAuth = inject(AuthService);     // Servicio para autenticación
+  private enrutador = inject(Router);             // Para navegación programática
 
+  /**
+   * @constructor
+   * @description Constructor del componente de login
+   * Inicializa el formulario reactivo con sus validaciones
+   * 
+   * Implementado por: CANCELO JULIAN - NICOLAS OTERO
+   */
   constructor() {
     // Inicialización del formulario reactivo con validaciones
     this.formularioLogin = this.constructorForm.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      email: ['', [Validators.required, Validators.email]],         // Valida formato de email
+      password: ['', [Validators.required, Validators.minLength(6)]] // Mínimo 6 caracteres
     });
   }
 
   /**
-   * Muestra u oculta el panel de credenciales de demostración
+   * @method alternarCredenciales
+   * @description Muestra u oculta el panel de credenciales de demostración
+   * Implementa un toggle simple para el panel de usuarios de prueba
    * @returns void
+   * 
+   * Añadido para facilitar las pruebas durante la presentación al profesor
    */
   alternarCredenciales() {
     // Alternamos el valor del booleano usando negación
@@ -175,30 +233,42 @@ export class LoginComponent {
   }
 
   /**
-   * Método para procesar el inicio de sesión
+   * @method iniciarSesion
+   * @description Método principal para procesar el inicio de sesión
    * Valida el formulario y envía las credenciales al servicio de autenticación
+   * 
+   * Implementado como parte del TP Final de Algoritmos y Estructuras de Datos III (2025)
+   * @author CANCELO JULIAN - NICOLAS OTERO (Curso 3ra 1RA)
    */
   iniciarSesion() {
     // Si el formulario es inválido, salimos sin hacer nada
     if (this.formularioLogin.invalid) {
+      // La validación visual ya se maneja con las clases CSS condicionales
       return;
     }
 
-    // Activamos el indicador de carga
+    // Activamos el indicador de carga (muestra spinner en el botón)
     this.cargando = true;
-    // Extraemos email y contraseña del formulario usando desestructuración
+    
+    // Extraemos email y contraseña del formulario usando desestructuración de ES6
     const { email, password } = this.formularioLogin.value;
 
-    // Llamamos al servicio de autenticación y nos suscribimos al observable
+    /**
+     * Llamamos al servicio de autenticación y nos suscribimos al observable
+     * Utilizamos el patrón de Observer con los métodos next, error y complete
+     * para manejar los diferentes casos de la petición asíncrona
+     */
     this.servicioAuth.login(email, password).subscribe({
+      // Manejador de respuesta exitosa
       next: (success) => {
         if (success) {
+          // Notificación estilizada usando SweetAlert2 (mejor experiencia de usuario)
           Swal.fire({
             icon: 'success',
             title: '¡Inicio de sesión exitoso!',
             text: 'Bienvenido de nuevo.',
-            timer: 1500,
-            showConfirmButton: false
+            timer: 1500,            // Desaparece automáticamente
+            showConfirmButton: false // Sin botón de confirmación
           });
           // Navegamos al dashboard tras el éxito de la autenticación
           this.enrutador.navigate(['/dashboard']);
@@ -211,6 +281,10 @@ export class LoginComponent {
           });
         }
       },
+      /**
+       * Manejador de errores de conexión o servidor
+       * Se ejecuta cuando hay problemas en la comunicación con el backend
+       */
       error: () => {
         // Manejo de errores de conexión o servidor
         Swal.fire({
@@ -219,11 +293,21 @@ export class LoginComponent {
           text: 'No se pudo conectar con el servidor. Intente más tarde.'
         });
       },
+      /**
+       * Manejador que se ejecuta siempre al finalizar la petición
+       * Independientemente de si fue exitosa o hubo error
+       */
       complete: () => {
         // Desactivamos el indicador de carga al finalizar
         this.cargando = false;
       }
     });
   }
+  
+  /**
+   * @note Componente implementado por CANCELO JULIAN y NICOLAS OTERO
+   * Curso 3ra 1RA - TP Final Algoritmos y Estructuras de Datos III - 2025
+   * Profesor: Sebastian Saldivar
+   */
 
 }

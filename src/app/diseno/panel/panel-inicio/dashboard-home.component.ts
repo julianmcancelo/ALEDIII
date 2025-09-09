@@ -4,7 +4,6 @@ import { RouterModule, Router } from '@angular/router';
 import { AuthService, User } from '../../../nucleo/servicios/auth.service';
 import { DashboardService, DashboardStats } from '../../../nucleo/servicios/dashboard.service';
 import { UserService, Usuario } from '../../../nucleo/servicios/user.service';
-import { inject } from '@angular/core';
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -24,12 +23,12 @@ export class DashboardHomeComponent implements OnInit {
   cargandoStats = true;
   mostrarModalTipoUsuario = false;
 
-  private authService = inject(AuthService);
-  private userService = inject(UserService);
-  private dashboardService = inject(DashboardService);
-  private router = inject(Router);
-
-  constructor() {}
+  constructor(
+    private authService: AuthService,
+    private dashboardService: DashboardService,
+    private userService: UserService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
@@ -81,7 +80,7 @@ export class DashboardHomeComponent implements OnInit {
 
   crearTipoUsuario(tipo: 'student' | 'profesor' | 'admin'): void {
     this.cerrarModalTipoUsuario();
-    this.router.navigate(['/gestion-usuarios'], { 
+    this.router.navigate(['/dashboard/gestion-usuarios'], { 
       queryParams: { tipo: tipo, accion: 'crear' } 
     });
   }

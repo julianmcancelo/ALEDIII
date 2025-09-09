@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService, CrearUsuarioRequest } from '../../../nucleo/servicios/user.service';
 import { CarrerasService, Carrera } from '../../../nucleo/servicios/carreras.service';
+import { UserRole } from '../../../nucleo/modelos/user.model';
 import Swal from 'sweetalert2';
 
-export type TipoUsuario = 'student' | 'profesor' | 'admin';
+// Ahora usamos UserRole del modelo user.model.ts
 
 @Component({
   selector: 'app-modal-crear-usuario',
@@ -387,7 +388,7 @@ export type TipoUsuario = 'student' | 'profesor' | 'admin';
 })
 export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
   @Input() mostrar = false;
-  @Input() tipoUsuario: TipoUsuario = 'student';
+  @Input() tipoUsuario: UserRole = 'student';
   @Output() cerrarModal = new EventEmitter<void>();
   @Output() usuarioCreado = new EventEmitter<any>();
 

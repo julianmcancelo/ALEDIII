@@ -3,8 +3,9 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { UserService, Usuario, CrearUsuarioRequest } from '../../../nucleo/servicios/user.service';
+import { UserRole } from '../../../nucleo/modelos/user.model';
 import { AuthService } from '../../../nucleo/servicios/auth.service';
-import { ModalCrearUsuarioComponent, TipoUsuario } from '../../../compartido/modales/modal-crear-usuario/modal-crear-usuario.component';
+import { ModalCrearUsuarioComponent } from '../../../compartido/modales/modal-crear-usuario/modal-crear-usuario.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -57,92 +58,82 @@ import Swal from 'sweetalert2';
               <!-- Botón Crear Admin -->
               <button 
                 (click)="abrirModal('admin')"
-                class="bg-red-500 hover:bg-red-600 text-white p-6 rounded-lg transition-colors flex flex-col items-center group">
+                class="bg-purple-500 hover:bg-purple-600 text-white p-6 rounded-lg transition-colors flex flex-col items-center group">
                 <svg class="w-12 h-12 mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
                 <span class="font-semibold text-lg">Crear Administrador</span>
-                <span class="text-red-100 text-sm mt-1">Acceso completo al sistema</span>
+                <span class="text-purple-100 text-sm mt-1">Control total del sistema</span>
               </button>
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-6">
-
-          <!-- Lista de Usuarios -->
-          <div class="bg-white rounded-lg shadow-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h3 class="text-lg font-semibold text-gray-800">Usuarios del Sistema</h3>
-            </div>
-            
-            <div class="p-6">
-              <div *ngIf="cargandoUsuarios" class="text-center py-8">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                <p class="mt-2 text-gray-600">Cargando usuarios...</p>
-              </div>
-
-              <div *ngIf="!cargandoUsuarios && usuarios.length === 0" class="text-center py-8 text-gray-500">
-                No hay usuarios registrados
-              </div>
-
-              <div *ngIf="!cargandoUsuarios && usuarios.length > 0" class="space-y-3">
-                <div *ngFor="let usuario of usuarios" class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                  <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                      <h4 class="font-semibold text-gray-800">{{ usuario.name }}</h4>
-                      <p class="text-sm text-gray-600">{{ usuario.email }}</p>
-                      
-                      <!-- Información específica por rol -->
-                      <div *ngIf="usuario.role === 'student' && (usuario.dni || usuario.legajo || usuario.carrera_nombre)" class="mt-2 text-xs text-gray-500">
-                        <span *ngIf="usuario.dni" class="block">DNI: {{ usuario.dni }}</span>
-                        <span *ngIf="usuario.legajo" class="block">Legajo: {{ usuario.legajo }}</span>
-                        <span *ngIf="usuario.carrera_nombre" class="block">Carrera: {{ usuario.carrera_nombre }}</span>
+        <!-- Lista de usuarios existentes -->
+        <div class="bg-white rounded-lg shadow-lg">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800">Usuarios Registrados</h3>
+            <p class="text-gray-600 text-sm mt-1">Lista de todos los usuarios del sistema</p>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Creación</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let usuario of usuarios" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                          <span class="text-sm font-medium text-gray-700">{{getInitials(usuario.name)}}</span>
+                        </div>
                       </div>
-                      
-                      <div *ngIf="usuario.role === 'profesor' && usuario.telefono" class="mt-2 text-xs text-gray-500">
-                        <span *ngIf="usuario.telefono" class="block">Teléfono: {{ usuario.telefono }}</span>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{usuario.name}}</div>
+                        <div class="text-sm text-gray-500" *ngIf="usuario.apellidos">{{usuario.apellidos}}</div>
                       </div>
-                      
-                      <div *ngIf="usuario.role === 'admin' && usuario.departamento" class="mt-2 text-xs text-gray-500">
-                        <span class="block">Departamento: {{ usuario.departamento }}</span>
-                      </div>
-                      
-                      <div class="mt-2">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                              [ngClass]="{
-                                'bg-red-100 text-red-800': usuario.role === 'admin',
-                                'bg-green-100 text-green-800': usuario.role === 'profesor',
-                                'bg-blue-100 text-blue-800': usuario.role === 'student'
-                              }">
-                          {{ getRoleLabel(usuario.role) }}
-                        </span>
-                      </div>
-                      <p *ngIf="usuario.created_at" class="text-xs text-gray-500 mt-1">
-                        Creado: {{ formatDate(usuario.created_at) }}
-                      </p>
                     </div>
-                    
-                    <button 
-                      *ngIf="usuario.id !== currentUser?.id"
-                      (click)="eliminarUsuario(usuario)"
-                      class="ml-4 text-red-600 hover:text-red-800 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{usuario.email}}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                          [ngClass]="{
+                            'bg-blue-100 text-blue-800': usuario.role === 'student',
+                            'bg-green-100 text-green-800': usuario.role === 'profesor',
+                            'bg-purple-100 text-purple-800': usuario.role === 'admin'
+                          }">
+                      {{getRoleLabel(usuario.role)}}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{formatDate(usuario.created_at)}}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button (click)="eliminarUsuario(usuario)" 
+                            class="text-red-600 hover:text-red-900 ml-2">
+                      Eliminar
                     </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal para crear usuarios -->
+    <!-- Modal para crear usuario -->
     <app-modal-crear-usuario
-      [mostrar]="mostrarModal"
+      *ngIf="mostrarModal"
       [tipoUsuario]="tipoUsuarioSeleccionado"
       (cerrarModal)="cerrarModal()"
       (usuarioCreado)="onUsuarioCreado($event)">
@@ -150,64 +141,45 @@ import Swal from 'sweetalert2';
   `
 })
 export class GestionUsuariosComponent implements OnInit {
-  usuarios: Usuario[] = [];
-  cargandoUsuarios = false;
-  currentUser: any = null;
-  
-  // Variables para el modal
-  mostrarModal = false;
-  tipoUsuarioSeleccionado: TipoUsuario = 'student';
-
   private userService = inject(UserService);
   private authService = inject(AuthService);
-  private route = inject(ActivatedRoute);
 
-  ngOnInit(): void {
-    this.currentUser = this.authService.getCurrentUser();
+  usuarios: Usuario[] = [];
+  mostrarModal = false;
+  tipoUsuarioSeleccionado: UserRole = 'student';
+
+  ngOnInit() {
     this.cargarUsuarios();
-    
-    // Verificar si viene con parámetros para abrir modal automáticamente
-    this.route.queryParams.subscribe(params => {
-      if (params['accion'] === 'crear' && params['tipo']) {
-        this.tipoUsuarioSeleccionado = params['tipo'] as TipoUsuario;
-        this.mostrarModal = true;
-      }
-    });
   }
 
-  constructor() {}
-
-  cargarUsuarios(): void {
-    this.cargandoUsuarios = true;
+  cargarUsuarios() {
     this.userService.getUsuarios().subscribe({
       next: (usuarios) => {
         this.usuarios = usuarios;
-        this.cargandoUsuarios = false;
       },
       error: (error) => {
         console.error('Error al cargar usuarios:', error);
-        this.cargandoUsuarios = false;
         Swal.fire('Error', 'No se pudieron cargar los usuarios', 'error');
       }
     });
   }
 
-  abrirModal(tipo: TipoUsuario): void {
-    console.log('Abriendo modal para tipo:', tipo); // Debug
+  abrirModal(tipo: UserRole) {
     this.tipoUsuarioSeleccionado = tipo;
     this.mostrarModal = true;
-    console.log('Estado del modal:', this.mostrarModal); // Debug
   }
 
-  cerrarModal(): void {
+  cerrarModal() {
     this.mostrarModal = false;
   }
 
-  onUsuarioCreado(usuario: any): void {
-    this.cargarUsuarios(); // Recargar la lista de usuarios
+  onUsuarioCreado(usuario: Usuario) {
+    this.usuarios.push(usuario);
+    this.cerrarModal();
+    Swal.fire('Éxito', 'Usuario creado correctamente', 'success');
   }
 
-  eliminarUsuario(usuario: Usuario): void {
+  eliminarUsuario(usuario: Usuario) {
     Swal.fire({
       title: '¿Estás seguro?',
       text: `¿Deseas eliminar al usuario ${usuario.name}?`,
@@ -221,8 +193,8 @@ export class GestionUsuariosComponent implements OnInit {
       if (result.isConfirmed) {
         this.userService.eliminarUsuario(usuario.id).subscribe({
           next: () => {
-            Swal.fire('¡Eliminado!', 'Usuario eliminado correctamente', 'success');
-            this.cargarUsuarios();
+            this.usuarios = this.usuarios.filter(u => u.id !== usuario.id);
+            Swal.fire('Eliminado', 'Usuario eliminado correctamente', 'success');
           },
           error: (error) => {
             console.error('Error al eliminar usuario:', error);
@@ -233,20 +205,21 @@ export class GestionUsuariosComponent implements OnInit {
     });
   }
 
-  getRoleLabel(role: string): string {
-    const roles = {
-      'admin': 'Administrador',
-      'profesor': 'Profesor',
-      'student': 'Estudiante'
-    };
-    return roles[role as keyof typeof roles] || role;
+  getInitials(name: string): string {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   }
 
-  formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('es-AR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  getRoleLabel(role: string): string {
+    const labels: { [key: string]: string } = {
+      'student': 'Estudiante',
+      'profesor': 'Profesor',
+      'admin': 'Administrador'
+    };
+    return labels[role] || role;
+  }
+
+  formatDate(dateString?: string): string {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('es-ES');
   }
 }
