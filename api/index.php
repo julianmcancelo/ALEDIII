@@ -18,6 +18,7 @@ require_once 'config/database.php';
 require_once 'controllers/AuthController.php';
 require_once 'controllers/NewsletterController.php';
 require_once 'controllers/CarrerasController.php';
+require_once 'controllers/MateriasController.php';
 
 // Obtener la ruta solicitada
 $request_uri = $_SERVER['REQUEST_URI'];
@@ -90,6 +91,38 @@ try {
         case preg_match('/^\/carreras\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'DELETE':
             $controller = new CarrerasController();
             $controller->deleteCarrera($matches[1]);
+            break;
+
+        // Rutas de materias
+        case preg_match('/^\/materias$/', $path) && $method === 'GET':
+            $controller = new MateriasController();
+            if (isset($_GET['carrera_id']) && isset($_GET['anio'])) {
+                $controller->getMateriasByAnio($_GET['carrera_id'], $_GET['anio']);
+            } elseif (isset($_GET['carrera_id'])) {
+                $controller->getMateriasByCarrera($_GET['carrera_id']);
+            } else {
+                $controller->getMaterias();
+            }
+            break;
+
+        case preg_match('/^\/materias\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'GET':
+            $controller = new MateriasController();
+            $controller->getMateriaById($matches[1]);
+            break;
+
+        case preg_match('/^\/materias$/', $path) && $method === 'POST':
+            $controller = new MateriasController();
+            $controller->createMateria();
+            break;
+
+        case preg_match('/^\/materias\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'PUT':
+            $controller = new MateriasController();
+            $controller->updateMateria($matches[1]);
+            break;
+
+        case preg_match('/^\/materias\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'DELETE':
+            $controller = new MateriasController();
+            $controller->deleteMateria($matches[1]);
             break;
 
         // Rutas de newsletter
