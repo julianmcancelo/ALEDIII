@@ -132,12 +132,24 @@ try {
             $controller->getProfesores();
             break;
 
-        case preg_match('/^\/profesores\/([a-zA-Z0-9\-]+)$/', $path, $matches) && $method === 'GET':
+        case preg_match('/^\/profesores\/(\d+)$/', $path, $matches) && $method === 'GET':
             $controller = new ProfesoresController();
-            if (isset($_GET['materias'])) {
-                $controller->getMateriasByProfesor($matches[1]);
-            } else {
+            if (isset($matches[1])) {
                 $controller->getProfesorById($matches[1]);
+            }
+            break;
+
+        case preg_match('/^\/profesores\/(\d+)\/materias$/', $path, $matches) && $method === 'GET':
+            $controller = new ProfesoresController();
+            if (isset($matches[1])) {
+                $controller->getMateriasByProfesor($matches[1]);
+            }
+            break;
+
+        case preg_match('/^\/carreras\/(\d+)\/profesores$/', $path, $matches) && $method === 'GET':
+            $controller = new ProfesoresController();
+            if (isset($matches[1])) {
+                $controller->getProfesoresByCarrera($matches[1]);
             }
             break;
 

@@ -166,8 +166,10 @@ export class GestionUsuariosComponent implements OnInit {
   }
 
   abrirModal(tipo: UserRole) {
+    console.log('Abriendo modal para tipo:', tipo);
     this.tipoUsuarioSeleccionado = tipo;
     this.mostrarModal = true;
+    console.log('Modal mostrar:', this.mostrarModal);
   }
 
   cerrarModal() {

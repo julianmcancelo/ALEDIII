@@ -16,6 +16,7 @@ import Swal from 'sweetalert2';
     <div *ngIf="mostrar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
          (click)="cerrar()" 
          style="z-index: 9999;">
+      <!-- DEBUG: Modal está visible: {{mostrar}}, Tipo: {{tipoUsuario}} -->
       <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center"
