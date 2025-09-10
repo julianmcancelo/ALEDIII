@@ -28,6 +28,11 @@ class Database {
         }
         return $this->pdo;
     }
+}
 
+// Función global para obtener conexión PDO
+function getDBConnection() {
+    $database = new Database();
+    return $database->connect();
 }
 ?>

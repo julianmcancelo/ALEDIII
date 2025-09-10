@@ -6,11 +6,48 @@ import { NewsletterService } from '../../nucleo/servicios/newsletter.service';
 import Swal from 'sweetalert2';
 import { User, AuthService } from '../../nucleo/servicios/auth.service';
 import { Subscription } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+
+// Angular Material Imports
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatRippleModule } from '@angular/material/core';
+import { MatMenuModule } from '@angular/material/menu';
+
+import { NoticiasService, Noticia } from '../../nucleo/servicios/noticias.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [
+    CommonModule, 
+    RouterLink, 
+    ReactiveFormsModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatChipsModule,
+    MatRippleModule,
+    MatMenuModule,
+    MatDividerModule,
+    MatBadgeModule,
+    MatListModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -28,11 +65,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   private userSubscription: Subscription | undefined;
 
+  // Noticias
+  noticias: Noticia[] = [];
+  cargandoNoticias = false;
+
   // Inyección de dependencias moderna con inject() para mayor claridad.
   private fb = inject(FormBuilder);
   private newsletterService = inject(NewsletterService);
   private authService = inject(AuthService); // Servicio para la gestión de autenticación.
   private router = inject(Router); // Servicio para la navegación.
+  private noticiasService = inject(NoticiasService);
 
   constructor() {
     this.subscriptionForm = this.fb.group({
@@ -46,6 +88,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.userSubscription = this.authService.currentUser$.subscribe((user: User | null) => {
       this.currentUser = user;
     });
+    
+    // Cargar noticias recientes
+    this.cargarNoticias();
     
     // Iniciar el slider automático
     this.startAutoSlide();
@@ -78,6 +123,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  scrollToSection(sectionId: string) {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   onSubscribe() {
@@ -173,5 +225,50 @@ export class HomeComponent implements OnInit, OnDestroy {
     
     // Reiniciar el timer
     this.startAutoSlide();
+  }
+
+  /**
+   * Cargar noticias recientes para mostrar en el home
+   */
+  cargarNoticias(): void {
+    this.cargandoNoticias = true;
+    
+    this.noticiasService.obtenerNoticiasRecientes().subscribe({
+      next: (noticias) => {
+        this.noticias = noticias;
+        this.cargandoNoticias = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar noticias:', error);
+        this.cargandoNoticias = false;
+        // En caso de error, usar noticias por defecto
+        this.noticias = [];
+      }
+    });
+  }
+
+  /**
+   * Obtener color del chip según el índice de la noticia
+   */
+  obtenerColorNoticia(index: number): 'primary' | 'accent' | 'warn' {
+    const colores: ('primary' | 'accent' | 'warn')[] = ['primary', 'accent', 'warn'];
+    return colores[index % colores.length];
+  }
+
+  /**
+   * Formatear fecha para mostrar en las noticias
+   */
+  formatearFecha(fecha: string): string {
+    return this.noticiasService.formatearFechaCorta(fecha);
+  }
+
+  /**
+   * Manejar error de carga de imagen
+   */
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = 'assets/images/home/default-news.jpg';
+    }
   }
 }

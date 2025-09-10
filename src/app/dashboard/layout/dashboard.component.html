@@ -1,67 +1,53 @@
-<div class="wp-admin-container">
-  <header class="wp-admin-header">
-    <div class="wp-header-content">
-      <div class="wp-header-left">
-        <button (click)="toggleSidebar()" class="wp-menu-toggle">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
-        <div class="wp-admin-logo">
-          <img src="assets/logo.png" alt="ITB Logo" class="wp-logo-icon">
-        </div>
-        <div class="wp-header-title">
-          <h1>Instituto Tecnológico Beltrán</h1>
-          <div class="wp-subtitle">Panel de Administración</div>
-        </div>
-      </div>
-      
-      <div class="wp-header-right">
-        <div class="wp-user-menu">
-          <button (click)="toggleUserMenu()" class="wp-user-toggle">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-            </svg>
-            <span>{{currentUser?.name}}</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
-          
-          <div *ngIf="showUserMenu" class="wp-user-dropdown">
-            <a href="#" class="wp-dropdown-item">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-              </svg>
-              Perfil
-            </a>
-            <a href="#" class="wp-dropdown-item">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
-              Configuración
-            </a>
-            <div class="wp-dropdown-divider"></div>
-            <button (click)="logout()" class="wp-dropdown-item wp-logout">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-              </svg>
-              Cerrar Sesión
-            </button>
-          </div>
-        </div>
-      </div>
+<!-- Angular Material Dashboard Layout -->
+<div class="dashboard-container">
+  <!-- Material Toolbar Header -->
+  <mat-toolbar color="primary" class="dashboard-toolbar">
+    <button mat-icon-button (click)="toggleSidebar()" class="menu-button">
+      <mat-icon>menu</mat-icon>
+    </button>
+    
+    <div class="toolbar-logo">
+      <img src="assets/logo.png" alt="ITB Logo" class="logo-icon">
+      <span class="toolbar-title">Instituto Tecnológico Beltrán</span>
     </div>
-  </header>
+    
+    <span class="toolbar-spacer"></span>
+    
+    <!-- User Menu -->
+    <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+      <mat-icon>account_circle</mat-icon>
+      <span class="user-name">{{currentUser?.name}}</span>
+      <mat-icon>arrow_drop_down</mat-icon>
+    </button>
+    
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item>
+        <mat-icon>person</mat-icon>
+        <span>Perfil</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>settings</mat-icon>
+        <span>Configuración</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar Sesión</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
 
-  <div class="wp-admin-body" [class.sidebar-hidden]="!showSidebar">
-    <!-- WordPress-style Sidebar -->
-    <app-sidebar *ngIf="showSidebar" class="wp-sidebar"></app-sidebar>
+  <!-- Material Sidenav Container -->
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #sidenav [opened]="showSidebar" mode="side" class="sidenav">
+      <app-sidebar></app-sidebar>
+    </mat-sidenav>
 
     <!-- Main Content -->
-    <main class="wp-main-content" [class.wp-sidebar-collapsed]="!showSidebar">
-      <router-outlet></router-outlet>
-    </main>
-  </div>
+    <mat-sidenav-content class="main-content">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </div>

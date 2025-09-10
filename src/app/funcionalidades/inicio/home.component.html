@@ -1,74 +1,104 @@
 <div class="bg-gray-100 font-sans">
 
-  <!-- Header -->
-  <header class="bg-white shadow-md relative">
-    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-      <div>
-        <a href="#">
-          <img src="assets/images/home/logo_beltran.png" alt="Instituto Tecnológico Beltrán" class="h-12">
-        </a>
-      </div>
-      <div class="hidden md:flex items-center space-x-6">
-        <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Inicio</a>
-        <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Carreras</a>
-        <a routerLink="/instalaciones" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Instalaciones</a>
-        <a href="#noticias" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Noticias</a>
-        <a href="#contacto" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Contacto</a>
-        <!-- Bloque dinámico para el estado de la sesión del usuario -->
-        <div *ngIf="currentUser; else showLoginButton" class="flex items-center space-x-4">
-          <span class="text-gray-700 font-medium">¡Hola, {{ currentUser.name }}!</span>
-          <a routerLink="/dashboard" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors duration-300">
-            Ir al Dashboard
-          </a>
-          <button (click)="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors duration-300">
-            Cerrar Sesión
+  <!-- =================================================================== -->
+  <!-- Header: Barra de navegación principal con logo, menú y botones de  -->
+  <!-- autenticación. Incluye funcionalidad responsive para móviles.     -->
+  <!-- =================================================================== -->
+  <mat-toolbar class="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg border-b border-gray-200" color="primary">
+    <div class="container mx-auto px-6 w-full">
+      <div class="flex items-center justify-between w-full">
+        <!-- Logo -->
+        <div class="flex items-center space-x-3">
+          <img src="assets/logo.png" alt="Logo" class="h-12 w-auto">
+          <div class="hidden sm:block">
+            <h1 class="text-xl font-bold text-white">Instituto Técnico Beltrán</h1>
+            <p class="text-sm text-blue-100">Excelencia en Educación Técnica</p>
+          </div>
+        </div>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center space-x-4">
+          <button mat-button class="text-white" (click)="scrollToSection('noticias')">
+            <mat-icon>article</mat-icon>
+            Noticias
+          </button>
+          <button mat-button class="text-white">
+            <mat-icon>school</mat-icon>
+            Carreras
+          </button>
+          <button mat-button class="text-white">
+            <mat-icon>contact_mail</mat-icon>
+            Contacto
           </button>
         </div>
 
-        <!-- Plantilla que se muestra si no hay usuario logueado -->
-        <ng-template #showLoginButton>
-          <a routerLink="/auth/login" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">Iniciar Sesión</a>
-        </ng-template>
-      </div>
-      <div class="md:hidden">
-        <button (click)="toggleMenu()" class="text-gray-600 hover:text-blue-600 focus:outline-none">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-          </svg>
-        </button>
-      </div>
-    </nav>
-    <!-- Mobile Menu -->
-    <div [hidden]="!isMenuOpen" class="md:hidden bg-white shadow-lg absolute w-full">
-      <a href="#" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Inicio</a>
-      <a href="#" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Carreras</a>
-      <a routerLink="/instalaciones" (click)="toggleMenu()" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Instalaciones</a>
-      <a href="#noticias" (click)="toggleMenu()" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Noticias</a>
-      <a href="#contacto" (click)="toggleMenu()" class="block px-6 py-3 text-gray-600 hover:bg-gray-100">Contacto</a>
-      <!-- Bloque dinámico para el menú móvil -->
-      <div *ngIf="currentUser; else showMobileLoginButton" class="px-6 py-3">
-        <div class="text-gray-700 font-medium mb-3">¡Hola, {{ currentUser.name }}!</div>
-        <a routerLink="/dashboard" (click)="toggleMenu()" class="block w-full text-center mb-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors duration-300">
-          Ir al Dashboard
-        </a>
-        <button (click)="logout(); toggleMenu()" class="block w-full text-center bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors duration-300">
-          Cerrar Sesión
-        </button>
-      </div>
+        <!-- Auth Buttons -->
+        <div class="hidden md:flex items-center space-x-2">
+          <ng-container *ngIf="!currentUser">
+            <button mat-raised-button color="accent" routerLink="/auth/login">
+              <mat-icon>login</mat-icon>
+              Iniciar Sesión
+            </button>
+          </ng-container>
+          <ng-container *ngIf="currentUser">
+            <button mat-raised-button color="accent" routerLink="/dashboard">
+              <mat-icon>dashboard</mat-icon>
+              Dashboard
+            </button>
+            <button mat-raised-button color="warn" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              Cerrar Sesión
+            </button>
+          </ng-container>
+        </div>
 
-      <!-- Plantilla para el botón de Iniciar Sesión en móvil -->
-      <ng-template #showMobileLoginButton>
-        <a routerLink="/auth/login" (click)="toggleMenu()" class="block px-6 py-3 text-white bg-blue-600 hover:bg-blue-700">Iniciar Sesión</a>
-      </ng-template>
+        <!-- Mobile Menu Button -->
+        <button mat-icon-button class="md:hidden text-white" [matMenuTriggerFor]="mobileMenu">
+          <mat-icon>menu</mat-icon>
+        </button>
+        
+        <!-- Mobile Menu -->
+        <mat-menu #mobileMenu="matMenu">
+          <button mat-menu-item (click)="scrollToSection('noticias')">
+            <mat-icon>article</mat-icon>
+            <span>Noticias</span>
+          </button>
+          <button mat-menu-item>
+            <mat-icon>school</mat-icon>
+            <span>Carreras</span>
+          </button>
+          <button mat-menu-item>
+            <mat-icon>contact_mail</mat-icon>
+            <span>Contacto</span>
+          </button>
+          <mat-divider></mat-divider>
+          <ng-container *ngIf="!currentUser">
+            <button mat-menu-item routerLink="/auth/login">
+              <mat-icon>login</mat-icon>
+              <span>Iniciar Sesión</span>
+            </button>
+          </ng-container>
+          <ng-container *ngIf="currentUser">
+            <button mat-menu-item routerLink="/dashboard">
+              <mat-icon>dashboard</mat-icon>
+              <span>Dashboard</span>
+            </button>
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Cerrar Sesión</span>
+            </button>
+          </ng-container>
+        </mat-menu>
+      </div>
     </div>
-  </header>
+  </mat-toolbar>
 
   <!-- Main Content -->
   <main>
     <!-- =================================================================== -->
     <!-- Slider Section: Banner principal con slider para la institución   -->
     <!-- =================================================================== -->
-    <section class="relative h-screen">
+    <section class="relative h-screen mt-20">
       <!-- Contenedor del slider -->
       <div class="relative h-full overflow-hidden">
         <!-- Slides -->
@@ -76,11 +106,28 @@
           <!-- Slide 1 -->
           <div class="slide absolute w-full h-full bg-cover bg-center transition-opacity duration-1000"
                [ngClass]="{'opacity-100': currentSlide === 0, 'opacity-0': currentSlide !== 0}"
-               style="background-image: url('assets/images/home/home.jpg');">
-            <div class="container mx-auto h-full flex items-center justify-center">
-              <div class="text-center bg-black bg-opacity-50 p-8 rounded-lg text-white max-w-4xl">
-                <h1 class="text-5xl font-extrabold mb-4">CENTRO DE FORMACIÓN PROFESIONAL N° 411</h1>
-                <p class="text-xl">El Centro de Formación Profesional (CFP) Nº 411 de Avellaneda, surge de un convenio celebrado entre la Dirección General de Cultura y Educación de la Provincia de Buenos Aires, la Unión Obrera Metalúrgica -Seccional Avellaneda-, y la Asociación Civil DISAL, con el objetivo de promover la formación profesional y laboral de jóvenes y adultos de la toda la comunidad.</p>
+               style="background-image: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.6)), url('assets/images/home/home.jpg');">
+            <div class="container mx-auto h-full flex items-center justify-center px-6">
+              <div class="text-center bg-white/10 backdrop-blur-md p-12 rounded-3xl text-white max-w-5xl border border-white/20 shadow-2xl">
+                <div class="mb-6">
+                  <span class="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+                    🎓 Formación de Excelencia
+                  </span>
+                </div>
+                <h1 class="text-6xl font-black mb-6 leading-tight bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                  CENTRO DE FORMACIÓN PROFESIONAL N° 411
+                </h1>
+                <p class="text-xl leading-relaxed mb-8 text-blue-50">
+                  El Centro de Formación Profesional (CFP) Nº 411 de Avellaneda, surge de un convenio celebrado entre la Dirección General de Cultura y Educación de la Provincia de Buenos Aires, la Unión Obrera Metalúrgica -Seccional Avellaneda-, y la Asociación Civil DISAL, con el objetivo de promover la formación profesional y laboral de jóvenes y adultos de toda la comunidad.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a href="#noticias" class="bg-white text-blue-600 px-8 py-4 rounded-full font-bold hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <i class="fas fa-newspaper mr-2"></i>Ver Noticias
+                  </a>
+                  <a routerLink="/instalaciones" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-blue-600 transition-all duration-300">
+                    <i class="fas fa-building mr-2"></i>Conocer Instalaciones
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -88,11 +135,25 @@
           <!-- Slide 2 -->
           <div class="slide absolute w-full h-full bg-cover bg-center transition-opacity duration-1000"
                [ngClass]="{'opacity-100': currentSlide === 1, 'opacity-0': currentSlide !== 1}"
-               style="background-image: url('assets/images/home/noticia_110.jpg');">
-            <div class="container mx-auto h-full flex items-center justify-center">
-              <div class="text-center bg-black bg-opacity-50 p-8 rounded-lg text-white max-w-4xl">
-                <h1 class="text-5xl font-extrabold mb-4">FORMACIÓN PROFESIONAL</h1>
-                <p class="text-xl">Ofrecemos cursos y programas de formación diseñados para satisfacer las demandas del mercado laboral actual, con un enfoque práctico y profesional.</p>
+               style="background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(5, 150, 105, 0.6)), url('assets/images/home/noticia_110.jpg');">
+            <div class="container mx-auto h-full flex items-center justify-center px-6">
+              <div class="text-center bg-white/10 backdrop-blur-md p-12 rounded-3xl text-white max-w-5xl border border-white/20 shadow-2xl">
+                <div class="mb-6">
+                  <span class="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+                    💼 Preparación Laboral
+                  </span>
+                </div>
+                <h1 class="text-6xl font-black mb-6 leading-tight bg-gradient-to-r from-white to-green-100 bg-clip-text text-transparent">
+                  FORMACIÓN PROFESIONAL
+                </h1>
+                <p class="text-xl leading-relaxed mb-8 text-green-50">
+                  Ofrecemos cursos y programas de formación diseñados para satisfacer las demandas del mercado laboral actual, con un enfoque práctico y profesional que garantiza la inserción exitosa en el mundo del trabajo.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a href="#" class="bg-white text-green-600 px-8 py-4 rounded-full font-bold hover:bg-green-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <i class="fas fa-graduation-cap mr-2"></i>Ver Carreras
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -100,21 +161,35 @@
           <!-- Slide 3 -->
           <div class="slide absolute w-full h-full bg-cover bg-center transition-opacity duration-1000"
                [ngClass]="{'opacity-100': currentSlide === 2, 'opacity-0': currentSlide !== 2}"
-               style="background-image: url('assets/images/home/noticia_104.jpg');">
-            <div class="container mx-auto h-full flex items-center justify-center">
-              <div class="text-center bg-black bg-opacity-50 p-8 rounded-lg text-white max-w-4xl">
-                <h1 class="text-5xl font-extrabold mb-4">INSTALACIONES DE VANGUARDIA</h1>
-                <p class="text-xl">Contamos con talleres, laboratorios y espacios de aprendizaje equipados con tecnología de última generación para asegurar una formación de calidad.</p>
+               style="background-image: linear-gradient(135deg, rgba(147, 51, 234, 0.8), rgba(126, 34, 206, 0.6)), url('assets/images/home/noticia_104.jpg');">
+            <div class="container mx-auto h-full flex items-center justify-center px-6">
+              <div class="text-center bg-white/10 backdrop-blur-md p-12 rounded-3xl text-white max-w-5xl border border-white/20 shadow-2xl">
+                <div class="mb-6">
+                  <span class="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+                    🏢 Tecnología Avanzada
+                  </span>
+                </div>
+                <h1 class="text-6xl font-black mb-6 leading-tight bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent">
+                  INSTALACIONES DE VANGUARDIA
+                </h1>
+                <p class="text-xl leading-relaxed mb-8 text-purple-50">
+                  Contamos con talleres, laboratorios y espacios de aprendizaje equipados con tecnología de última generación para asegurar una formación de calidad que prepare a nuestros estudiantes para los desafíos del futuro.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a routerLink="/instalaciones" class="bg-white text-purple-600 px-8 py-4 rounded-full font-bold hover:bg-purple-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <i class="fas fa-camera mr-2"></i>Ver Galería
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Controles del slider -->
-        <div class="absolute bottom-5 left-0 right-0 flex justify-center space-x-2">
+        <div class="absolute bottom-8 left-0 right-0 flex justify-center space-x-3">
           <button *ngFor="let _ of [0, 1, 2]; let i = index" 
-                  class="w-3 h-3 rounded-full transition-all duration-300" 
-                  [ngClass]="{'bg-white': currentSlide === i, 'bg-gray-400': currentSlide !== i}"
+                  class="w-4 h-4 rounded-full transition-all duration-300 border-2 border-white/50" 
+                  [ngClass]="{'bg-white border-white': currentSlide === i, 'bg-transparent hover:bg-white/30': currentSlide !== i}"
                   (click)="setSlide(i)"
                   [attr.aria-label]="'Ir a slide ' + (i + 1)">
           </button>
@@ -122,7 +197,7 @@
 
         <!-- Botones de navegación -->
         <button 
-          class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-50 text-white p-2 rounded-full transition-all duration-300"
+          class="absolute top-1/2 left-6 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
           (click)="prevSlide()"
           [attr.aria-label]="'Slide anterior'">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -130,7 +205,7 @@
           </svg>
         </button>
         <button 
-          class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-30 hover:bg-opacity-50 text-white p-2 rounded-full transition-all duration-300"
+          class="absolute top-1/2 right-6 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
           (click)="nextSlide()"
           [attr.aria-label]="'Siguiente slide'">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,40 +221,57 @@
     <!-- Actualmente, el contenido es estático, pero se conectará a       -->
     <!-- Firebase para ser dinámico.                                       -->
     <!-- =================================================================== -->
-    <section id="noticias" class="bg-gray-50 py-12">
+    <section id="noticias" class="bg-gradient-to-br from-gray-50 to-blue-50 py-20">
       <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Últimas Noticias</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- News Card 1 -->
-          <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 transform hover:-translate-y-1 hover:shadow-xl">
-            <img src="assets/images/home/noticia_110.jpg" alt="Noticia 1" class="w-full h-48 object-cover">
-            <div class="p-6">
-              <p class="text-sm text-gray-500 mb-2">6 ago 2025</p>
-              <h3 class="text-lg font-semibold text-gray-800 mb-2">Aportes gubernamentales para mejoras</h3>
-              <p class="text-gray-600 text-sm mb-4">Como cada año, las autoridades de los diferentes servicios educativos del ITB trabajan en la confección y presentación del Plan de Mejora...</p>
-              <a href="#" class="text-blue-600 font-semibold hover:underline">LEER MÁS</a>
-            </div>
-          </div>
-          <!-- News Card 2 -->
-          <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 transform hover:-translate-y-1 hover:shadow-xl">
-            <img src="assets/images/home/noticia_109.jpg" alt="Noticia 2" class="w-full h-48 object-cover">
-            <div class="p-6">
-              <p class="text-sm text-gray-500 mb-2">24 mar 2025</p>
-              <h3 class="text-lg font-semibold text-gray-800 mb-2">Comienzo de clases: CICLO 2025</h3>
-              <p class="text-gray-600 text-sm mb-4">Inició un nuevo ciclo lectivo en el cual recibimos a más de 600 ingresantes de nuestras 9 tecnicaturas...</p>
-              <a href="#" class="text-blue-600 font-semibold hover:underline">LEER MÁS</a>
-            </div>
-          </div>
-          <!-- News Card 3 -->
-          <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 transform hover:-translate-y-1 hover:shadow-xl">
-            <img src="assets/images/home/noticia_104.jpg" alt="Noticia 3" class="w-full h-48 object-cover">
-            <div class="p-6">
-              <p class="text-sm text-gray-500 mb-2">11 oct 2024</p>
-              <h3 class="text-lg font-semibold text-gray-800 mb-2">9º Encuentro de Diseño Industrial</h3>
-              <p class="text-gray-600 text-sm mb-4">Entre el 7 y 10 de octubre se realizó el 9º EDIB en el Beltrán. Durante la última semana de septiembre se realizó el evento...</p>
-              <a href="#" class="text-blue-600 font-semibold hover:underline">LEER MÁS</a>
-            </div>
-          </div>
+        <div class="text-center mb-16">
+          <mat-chip-set>
+            <mat-chip color="primary">
+              <mat-icon>article</mat-icon>
+              Mantente Informado
+            </mat-chip>
+          </mat-chip-set>
+          <h2 class="text-5xl font-black text-gray-800 mb-4 mt-6">Últimas Noticias</h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">Descubre las novedades más importantes de nuestra institución</p>
+        </div>
+        <!-- Loading Spinner -->
+        <div *ngIf="cargandoNoticias" class="flex justify-center items-center py-20">
+          <mat-spinner diameter="50"></mat-spinner>
+          <span class="ml-4 text-lg text-gray-600">Cargando noticias...</span>
+        </div>
+
+        <!-- Noticias Dinámicas -->
+        <div *ngIf="!cargandoNoticias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <mat-card *ngFor="let noticia of noticias; let i = index" class="news-card" matRipple>
+            <img mat-card-image 
+                 [src]="noticia.imagen_url || 'assets/images/home/default-news.jpg'" 
+                 [alt]="noticia.titulo" 
+                 class="h-56 object-cover"
+                 (error)="onImageError($event)">
+            <mat-card-header>
+              <mat-chip [color]="obtenerColorNoticia(i)" class="mb-2">
+                {{ formatearFecha(noticia.fecha_publicacion) }}
+              </mat-chip>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-card-title class="text-xl font-bold mb-3">{{ noticia.titulo }}</mat-card-title>
+              <mat-card-subtitle class="text-gray-600 leading-relaxed">
+                {{ noticia.resumen }}
+              </mat-card-subtitle>
+            </mat-card-content>
+            <mat-card-actions align="end">
+              <button mat-button [color]="obtenerColorNoticia(i)">
+                <mat-icon>arrow_forward</mat-icon>
+                LEER MÁS
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+
+        <!-- Mensaje cuando no hay noticias -->
+        <div *ngIf="!cargandoNoticias && noticias.length === 0" class="text-center py-20">
+          <mat-icon class="text-6xl text-gray-400 mb-4">article</mat-icon>
+          <h3 class="text-2xl font-bold text-gray-600 mb-2">No hay noticias disponibles</h3>
+          <p class="text-gray-500">Las noticias se mostrarán aquí una vez que sean publicadas.</p>
         </div>
       </div>
     </section>
@@ -187,41 +279,98 @@
     <!-- Destacados Section: Muestra enlaces de interés y el formulario    -->
     <!-- de suscripción al newsletter.                                     -->
     <!-- =================================================================== -->
-    <section class="py-12">
+    <section class="py-20 bg-white">
       <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Destacados</h2>
+        <div class="text-center mb-16">
+          <mat-chip-set>
+            <mat-chip color="accent">
+              <mat-icon>star</mat-icon>
+              Recursos Destacados
+            </mat-chip>
+          </mat-chip-set>
+          <h2 class="text-5xl font-black text-gray-800 mb-4 mt-6">Enlaces de Interés</h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">Accede rápidamente a los recursos más importantes de nuestra institución</p>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Destacados</h3>
-            <ul class="space-y-2">
-              <li><a href="#" class="text-gray-600 hover:text-blue-600">Autoridades</a></li>
-              <li><a href="#" class="text-gray-600 hover:text-blue-600">Area de Idiomas</a></li>
-              <li><a href="#" class="text-gray-600 hover:text-blue-600">Entrevistas a Docentes</a></li>
-            </ul>
-          </div>
-          <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Otros Destacados</h3>
-            <ul class="space-y-2">
-              <li><a routerLink="/instalaciones" class="text-gray-600 hover:text-blue-600">Galería de instalaciones</a></li>
-              <li><a href="#" class="text-gray-600 hover:text-blue-600">Un paseo por el Edificio</a></li>
-              <li><a href="#" class="text-gray-600 hover:text-blue-600">Office 365</a></li>
-            </ul>
-          </div>
-          <div class="bg-white p-6 rounded-lg shadow-lg col-span-1 md:col-span-2">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Suscribite a Nuestro Newsletter</h3>
-            <form [formGroup]="subscriptionForm" (ngSubmit)="onSubscribe()" class="flex flex-col space-y-4">
-              <input type="email" formControlName="email" class="w-full rounded-md px-4 py-2 border border-gray-300 text-gray-800" placeholder="Tu email">
-              <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300 self-start">SUSCRIBIR</button>
-            </form>
-          </div>
+          <!-- Card Destacados -->
+          <mat-card class="highlight-card" matRipple>
+            <mat-card-header>
+              <mat-icon mat-card-avatar color="primary">people</mat-icon>
+              <mat-card-title>Destacados</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-nav-list>
+                <mat-list-item>
+                  <mat-icon matListItemIcon>chevron_right</mat-icon>
+                  <span matListItemTitle>Autoridades</span>
+                </mat-list-item>
+                <mat-list-item>
+                  <mat-icon matListItemIcon>chevron_right</mat-icon>
+                  <span matListItemTitle>Área de Idiomas</span>
+                </mat-list-item>
+                <mat-list-item>
+                  <mat-icon matListItemIcon>chevron_right</mat-icon>
+                  <span matListItemTitle>Entrevistas a Docentes</span>
+                </mat-list-item>
+              </mat-nav-list>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Card Otros Destacados -->
+          <mat-card class="highlight-card" matRipple>
+            <mat-card-header>
+              <mat-icon mat-card-avatar color="accent">star</mat-icon>
+              <mat-card-title>Otros Destacados</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-nav-list>
+                <mat-list-item routerLink="/instalaciones">
+                  <mat-icon matListItemIcon>chevron_right</mat-icon>
+                  <span matListItemTitle>Galería de instalaciones</span>
+                </mat-list-item>
+                <mat-list-item>
+                  <mat-icon matListItemIcon>chevron_right</mat-icon>
+                  <span matListItemTitle>Un paseo por el Edificio</span>
+                </mat-list-item>
+                <mat-list-item>
+                  <mat-icon matListItemIcon>chevron_right</mat-icon>
+                  <span matListItemTitle>Office 365</span>
+                </mat-list-item>
+              </mat-nav-list>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Newsletter Card -->
+          <mat-card class="newsletter-card col-span-1 md:col-span-2" matRipple>
+            <mat-card-header>
+              <mat-icon mat-card-avatar color="warn">email</mat-icon>
+              <mat-card-title>Suscríbete a Nuestro Newsletter</mat-card-title>
+              <mat-card-subtitle>Mantente al día con las últimas noticias, eventos y oportunidades educativas.</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <form [formGroup]="subscriptionForm" (ngSubmit)="onSubscribe()" class="flex flex-col sm:flex-row gap-4">
+                <mat-form-field appearance="outline" class="flex-1">
+                  <mat-label>Tu dirección de email</mat-label>
+                  <input matInput type="email" formControlName="email" placeholder="ejemplo@email.com">
+                  <mat-icon matSuffix>email</mat-icon>
+                  <mat-error *ngIf="subscriptionForm.get('email')?.hasError('required')">
+                    El email es requerido
+                  </mat-error>
+                  <mat-error *ngIf="subscriptionForm.get('email')?.hasError('email')">
+                    Ingresa un email válido
+                  </mat-error>
+                </mat-form-field>
+                <button mat-raised-button color="primary" type="submit" class="self-start sm:self-center">
+                  <mat-icon>send</mat-icon>
+                  SUSCRIBIR
+                </button>
+              </form>
+            </mat-card-content>
+          </mat-card>
         </div>
       </div>
     </section>
   </main>
-
-  <!-- =================================================================== -->
-  <!-- Footer: Pie de página con información de contacto, enlaces útiles -->
-  <!-- y copyright.                                                      -->
   <!-- =================================================================== -->
   <footer id="contacto" class="bg-gray-800 text-gray-300 py-8">
     <div class="container mx-auto px-6">
@@ -265,10 +414,14 @@
   </footer>
 
   <!-- Back to Top Button -->
-  <button *ngIf="showBackToTop" (click)="scrollToTop()" class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-300 z-50">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-    </svg>
+  <button *ngIf="showBackToTop" 
+          mat-fab 
+          color="primary" 
+          (click)="scrollToTop()" 
+          class="fixed bottom-8 right-8 z-50"
+          matTooltip="Volver arriba"
+          matTooltipPosition="left">
+    <mat-icon>keyboard_arrow_up</mat-icon>
   </button>
 
 </div>

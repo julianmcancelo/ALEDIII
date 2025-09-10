@@ -21,6 +21,7 @@ require_once 'controllers/CarrerasController.php';
 require_once 'controllers/MateriasController.php';
 require_once 'controllers/ProfesoresController.php';
 require_once 'controllers/AsignacionesController.php';
+require_once 'controllers/NoticiasController.php';
 
 // Obtener la ruta solicitada
 $request_uri = $_SERVER['REQUEST_URI'];
@@ -97,7 +98,7 @@ try {
             echo json_encode($controller->removerEstudiante());
             break;
 
-        // Rutas de autenticación
+        // Rutas de autenticaci車n
         case preg_match('/^\/users\/login$/', $path) && $method === 'POST':
             $controller = new AuthController();
             $controller->login();
@@ -224,6 +225,41 @@ try {
         case preg_match('/^\/newsletter$/', $path) && $method === 'POST':
             $controller = new NewsletterController();
             $controller->subscribe();
+            break;
+
+        // Rutas de noticias
+        case preg_match('/^\/noticias$/', $path) && $method === 'GET':
+            $controller = new NoticiasController();
+            if (isset($_GET['admin']) && $_GET['admin'] === 'true') {
+                $controller->getNoticiasAdmin();
+            } else {
+                $controller->getNoticiasPublicas();
+            }
+            break;
+
+        case preg_match('/^\/noticias\/(\d+)$/', $path, $matches) && $method === 'GET':
+            $controller = new NoticiasController();
+            $controller->getNoticiaById($matches[1]);
+            break;
+
+        case preg_match('/^\/noticias$/', $path) && $method === 'POST':
+            $controller = new NoticiasController();
+            $controller->crearNoticia();
+            break;
+
+        case preg_match('/^\/noticias\/(\d+)$/', $path, $matches) && $method === 'PUT':
+            $controller = new NoticiasController();
+            $controller->actualizarNoticia($matches[1]);
+            break;
+
+        case preg_match('/^\/noticias\/(\d+)$/', $path, $matches) && $method === 'DELETE':
+            $controller = new NoticiasController();
+            $controller->eliminarNoticia($matches[1]);
+            break;
+
+        case preg_match('/^\/noticias\/(\d+)\/estado$/', $path, $matches) && $method === 'PUT':
+            $controller = new NoticiasController();
+            $controller->cambiarEstadoNoticia($matches[1]);
             break;
 
 

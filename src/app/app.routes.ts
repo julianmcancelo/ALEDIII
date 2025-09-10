@@ -123,6 +123,12 @@ export const routes: Routes = [
             loadComponent: () => import('./funcionalidades/administracion/asignacion-materias/asignacion-materias.component').then(c => c.AsignacionMateriasComponent),
             canActivate: [AuthGuard, RoleGuard],
             data: { requiredRoles: ['admin'] }
+          },
+          {
+            path: 'gestion-noticias',
+            loadComponent: () => import('./funcionalidades/administracion/gestion-noticias/gestion-noticias.component').then(c => c.GestionNoticiasComponent),
+            canActivate: [AuthGuard, RoleGuard],
+            data: { requiredRoles: ['admin'] }
           }
         ]
       },

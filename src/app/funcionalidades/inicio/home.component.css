@@ -1,0 +1,90 @@
+/* Estilos personalizados para Angular Material */
+
+/* Cards de noticias */
+.news-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 16px !important;
+}
+
+.news-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Cards de destacados */
+.highlight-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.highlight-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Card de newsletter */
+.newsletter-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #fef7ff 0%, #f3e8ff 100%);
+}
+
+.newsletter-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Toolbar personalizado */
+.mat-toolbar {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+}
+
+/* Chips personalizados */
+.mat-mdc-chip {
+  border-radius: 20px !important;
+}
+
+/* Form fields */
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Botones personalizados */
+.mat-mdc-raised-button {
+  border-radius: 25px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* FAB button */
+.mat-mdc-fab {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.mat-mdc-fab:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* List items */
+.mat-mdc-list-item {
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+.mat-mdc-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .newsletter-card .flex {
+    flex-direction: column !important;
+  }
+  
+  .newsletter-card .mat-mdc-raised-button {
+    align-self: stretch !important;
+    margin-top: 16px !important;
+  }
+}

@@ -4,11 +4,20 @@
  * Proporciona la estructura de navegación y acceso a las diferentes secciones del sistema
  * Implementa un menú lateral con opciones dependientes del rol del usuario
  */
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService, User } from '../../nucleo/servicios/auth.service';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SidebarComponent } from './sidebar/sidebar.component';
+import { RouterOutlet, RouterModule, Router } from '@angular/router';
+import { AuthService, User } from '../../nucleo/servicios/auth.service';
+import { SidebarComponent } from '../components/sidebar/sidebar.component';
+
+// Angular Material Imports
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
 
 /**
  * @class DashboardComponent
@@ -18,7 +27,19 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, SidebarComponent],
+  imports: [
+    CommonModule, 
+    RouterOutlet,
+    RouterModule,
+    SidebarComponent,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatDividerModule,
+    MatSidenavModule,
+    MatListModule
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })

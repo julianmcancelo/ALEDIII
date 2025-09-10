@@ -76,8 +76,8 @@ export class AuthService {
       this.currentUserSubject.next(JSON.parse(savedUser));
     }
     
-    // Verificar si hay usuarios en el sistema
-    this.checkIfUsersExist();
+    // NO verificar automáticamente en el constructor para evitar cache incorrecto
+    // this.checkIfUsersExist();
   }
 
   /**
@@ -198,16 +198,12 @@ export class AuthService {
    * @returns {Observable<boolean>} Observable que emite true si hay usuarios, false si no hay ninguno
    */
   checkIfUsersExist(): Observable<boolean> {
-    // Si ya conocemos el estado, devolvemos el valor actual
-    if (this.hasUsersSubject.value !== null) {
-      return of(this.hasUsersSubject.value);
-    }
-    
-    // Si no lo conocemos, hacemos una consulta a la API
-    return this.http.get<User[]>(`${this.apiUrl}`).pipe(
-      map(users => {
-        const hasUsers = users && users.length > 0;
+    // Siempre hacer una nueva consulta para evitar problemas de cache
+    return this.http.get<CheckUsersResponse>(`${this.apiUrl}?check=true`).pipe(
+      map(response => {
+        const hasUsers = response.hasUsers;
         this.hasUsersSubject.next(hasUsers);
+        console.log('CheckUsersExist response:', response, 'hasUsers:', hasUsers);
         return hasUsers;
       }),
       catchError(error => {
