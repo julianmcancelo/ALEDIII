@@ -92,6 +92,35 @@ class AuthController {
             $id = $this->generateUUID();
             $hashedPassword = password_hash($input['password'], PASSWORD_DEFAULT);
             
+            // Preparar datos para inserción con valores por defecto
+            $userData = [
+                'id' => $id,
+                'email' => $input['email'],
+                'name' => $input['name'],
+                'apellidos' => $input['apellidos'] ?? null,
+                'role' => $input['role'],
+                'password_hash' => $hashedPassword,
+                'dni' => $input['dni'] ?? null,
+                'legajo' => $input['legajo'] ?? null,
+                'carrera_id' => $input['carrera_id'] ?? null,
+                'telefono' => $input['telefono'] ?? null,
+                'departamento' => $input['departamento'] ?? null,
+                'especialidad' => $input['especialidad'] ?? null,
+                'fechaNacimiento' => $input['fechaNacimiento'] ?? null,
+                'fechaInscripcion' => $input['fechaInscripcion'] ?? null,
+                'estado' => $input['estado'] ?? 'activo',
+                'calle' => $input['calle'] ?? null,
+                'ciudad' => $input['ciudad'] ?? null,
+                'provincia' => $input['provincia'] ?? null,
+                'codigoPostal' => $input['codigoPostal'] ?? null,
+                'contacto_emergencia_nombre' => $input['contacto_emergencia_nombre'] ?? null,
+                'contacto_emergencia_telefono' => $input['contacto_emergencia_telefono'] ?? null,
+                'contacto_emergencia_parentesco' => $input['contacto_emergencia_parentesco'] ?? null
+            ];
+
+            // Log para debug
+            error_log("Datos a insertar: " . json_encode($userData));
+
             try {
                 $stmt = $this->db->prepare("INSERT INTO usuarios (
                     id, email, name, apellidos, role, password_hash, 
@@ -101,30 +130,10 @@ class AuthController {
                     contacto_emergencia_nombre, contacto_emergencia_telefono, contacto_emergencia_parentesco
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 
-                $stmt->execute([
-                    $id,
-                    $input['email'],
-                    $input['name'],
-                    $input['apellidos'] ?? null,
-                    $input['role'],
-                    $hashedPassword,
-                    $input['dni'] ?? null,
-                    $input['legajo'] ?? null,
-                    $input['carrera_id'] ?? null,
-                    $input['telefono'] ?? null,
-                    $input['departamento'] ?? null,
-                    $input['especialidad'] ?? null,
-                    $input['fechaNacimiento'] ?? null,
-                    $input['fechaInscripcion'] ?? null,
-                    $input['estado'] ?? 'activo',
-                    $input['calle'] ?? null,
-                    $input['ciudad'] ?? null,
-                    $input['provincia'] ?? null,
-                    $input['codigoPostal'] ?? null,
-                    $input['contacto_emergencia_nombre'] ?? null,
-                    $input['contacto_emergencia_telefono'] ?? null,
-                    $input['contacto_emergencia_parentesco'] ?? null
-                ]);
+                $params = array_values($userData);
+                error_log("Número de parámetros: " . count($params));
+                
+                $stmt->execute($params);
 
                 header('Content-Type: application/json');
                 echo json_encode([
@@ -315,6 +324,32 @@ class AuthController {
             error_log("Error en getUserById: " . $e->getMessage());
             http_response_code(500);
             echo json_encode(['error' => 'Error al obtener usuario']);
+        }
+    }
+
+    public function getUsers() {
+        try {
+            $role = isset($_GET['role']) ? $_GET['role'] : null;
+            
+            if ($role) {
+                $sql = "SELECT id, email, name, role, dni, carrera, especialidad, telefono, departamento, created_at 
+                        FROM usuarios 
+                        WHERE role = :role 
+                        ORDER BY created_at DESC";
+                $stmt = $this->db->prepare($sql);
+                $stmt->bindParam(':role', $role);
+            } else {
+                $sql = "SELECT id, email, name, role, dni, carrera, especialidad, telefono, departamento, created_at 
+                        FROM usuarios 
+                        ORDER BY created_at DESC";
+                $stmt = $this->db->prepare($sql);
+            }
+            
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            http_response_code(500);
+            return ['error' => 'Error al obtener usuarios: ' . $e->getMessage()];
         }
     }
 

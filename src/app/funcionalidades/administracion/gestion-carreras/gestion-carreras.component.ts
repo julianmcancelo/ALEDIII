@@ -50,64 +50,145 @@ import { MatMenuModule } from '@angular/material/menu';
     MatMenuModule
   ],
   template: `
-    <div class="wp-admin-wrapper">
-      <!-- WordPress-style Header -->
-      <div class="wp-header">
-        <div class="wp-header-content">
-          <div class="wp-header-left">
-            <h1 class="wp-title">Gestión de Carreras</h1>
-            <p class="wp-subtitle">Administrar carreras académicas del instituto</p>
-          </div>
-          <div class="wp-header-stats">
-            <div class="wp-stat-item">
-              <span class="wp-stat-number">{{ carreras.length }}</span>
-              <span class="wp-stat-label">Total Carreras</span>
-            </div>
-            <div class="wp-stat-item">
-              <span class="wp-stat-number">{{ getCarrerasActivas() }}</span>
-              <span class="wp-stat-label">Activas</span>
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
+      <div class="max-w-7xl mx-auto">
+        <!-- Argon-style Header -->
+        <div class="bg-white rounded-3xl shadow-2xl mb-8 overflow-hidden border border-gray-100">
+          <div class="bg-gradient-to-r from-sky-400 via-blue-500 to-blue-800 px-8 py-8 relative overflow-hidden">
+            <div class="absolute inset-0 bg-black opacity-10"></div>
+            <div class="relative z-10">
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="flex items-center mb-3">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mr-4 backdrop-blur-sm">
+                      <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h1 class="text-4xl font-bold text-white mb-1">Gestión de Carreras</h1>
+                      <p class="text-white text-opacity-90 text-lg">Administrar carreras académicas del instituto</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                  <div class="text-right">
+                    <p class="text-white text-opacity-75 text-sm">Total Carreras</p>
+                    <p class="text-white text-2xl font-bold">{{ carreras.length }}</p>
+                  </div>
+                  <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="wp-admin-content">
-        <!-- WordPress-style Dashboard Widgets -->
-        <div class="wp-dashboard-widgets">
-          <div class="wp-widget">
-            <div class="wp-widget-header">
-              <h3>Resumen de Carreras</h3>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-gray-100 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-sky-300 to-blue-500 rounded-full -mr-10 -mt-10 opacity-10"></div>
+            <div class="relative z-10">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-14 h-14 bg-gradient-to-br from-sky-400 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs font-semibold text-green-500 flex items-center justify-end">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                    </svg>
+                    +3.48%
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total Carreras</p>
+                <p class="text-3xl font-bold text-gray-900 mt-1">{{ carreras.length }}</p>
+                <p class="text-xs text-gray-400 mt-1">Desde el último mes</p>
+              </div>
             </div>
-            <div class="wp-widget-content">
-              <div class="wp-stats-grid">
-                <div class="wp-stat-box">
-                  <div class="wp-stat-icon">🎓</div>
-                  <div class="wp-stat-info">
-                    <span class="wp-stat-value">{{ carreras.length }}</span>
-                    <span class="wp-stat-text">Total de Carreras</span>
-                  </div>
+          </div>
+
+          <div class="bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-gray-100 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-cyan-300 to-blue-400 rounded-full -mr-10 -mt-10 opacity-10"></div>
+            <div class="relative z-10">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-14 h-14 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
                 </div>
-                <div class="wp-stat-box">
-                  <div class="wp-stat-icon">✅</div>
-                  <div class="wp-stat-info">
-                    <span class="wp-stat-value">{{ getCarrerasActivas() }}</span>
-                    <span class="wp-stat-text">Carreras Activas</span>
-                  </div>
+                <div class="text-right">
+                  <p class="text-xs font-semibold text-green-500 flex items-center justify-end">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                    </svg>
+                    +2.15%
+                  </p>
                 </div>
-                <div class="wp-stat-box">
-                  <div class="wp-stat-icon">⏸️</div>
-                  <div class="wp-stat-info">
-                    <span class="wp-stat-value">{{ carreras.length - getCarrerasActivas() }}</span>
-                    <span class="wp-stat-text">Carreras Inactivas</span>
-                  </div>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Carreras Activas</p>
+                <p class="text-3xl font-bold text-gray-900 mt-1">{{ getCarrerasActivas() }}</p>
+                <p class="text-xs text-gray-400 mt-1">Carreras en curso</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-gray-100 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-700 rounded-full -mr-10 -mt-10 opacity-10"></div>
+            <div class="relative z-10">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-800 rounded-2xl flex items-center justify-center shadow-lg">
+                  <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
                 </div>
-                <div class="wp-stat-box">
-                  <div class="wp-stat-icon">📊</div>
-                  <div class="wp-stat-info">
-                    <span class="wp-stat-value">{{ getPromedioDuracion() }}</span>
-                    <span class="wp-stat-text">Promedio Duración</span>
-                  </div>
+                <div class="text-right">
+                  <p class="text-xs font-semibold text-red-500 flex items-center justify-end">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 7l-9.2 9.2M7 7l9.2 9.2"></path>
+                    </svg>
+                    -1.25%
+                  </p>
                 </div>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Carreras Inactivas</p>
+                <p class="text-3xl font-bold text-gray-900 mt-1">{{ carreras.length - getCarrerasActivas() }}</p>
+                <p class="text-xs text-gray-400 mt-1">Carreras pausadas</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-gray-100 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-300 to-blue-600 rounded-full -mr-10 -mt-10 opacity-10"></div>
+            <div class="relative z-10">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
+                  <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs font-semibold text-green-500 flex items-center justify-end">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                    </svg>
+                    +1.67%
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Promedio Duración</p>
+                <p class="text-3xl font-bold text-gray-900 mt-1">{{ getPromedioDuracion() }}</p>
+                <p class="text-xs text-gray-400 mt-1">Años promedio</p>
               </div>
             </div>
           </div>

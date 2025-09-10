@@ -1,0 +1,290 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Asignación de Materias</h1>
+        <p class="text-gray-600 mt-2">Gestiona la asignación de profesores y estudiantes a las materias</p>
+      </div>
+      <button 
+        (click)="volver()"
+        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+        <i class="fas fa-arrow-left mr-2"></i>
+        Volver
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Panel de Filtros y Materias -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Materias</h2>
+        
+        <!-- Filtros -->
+        <div class="space-y-4 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Carrera</label>
+            <select 
+              [(ngModel)]="carreraSeleccionada"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Todas las carreras</option>
+              <option *ngFor="let carrera of carreras" [value]="carrera.id">
+                {{ carrera.nombre }}
+              </option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Año</label>
+            <select 
+              [(ngModel)]="anioSeleccionado"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Todos los años</option>
+              <option value="1">1er Año</option>
+              <option value="2">2do Año</option>
+              <option value="3">3er Año</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Lista de Materias -->
+        <div class="space-y-2 max-h-96 overflow-y-auto">
+          <div 
+            *ngFor="let materia of materiasFiltradas"
+            (click)="seleccionarMateria(materia)"
+            [class.bg-blue-50]="materiaSeleccionada?.id === materia.id"
+            [class.border-blue-200]="materiaSeleccionada?.id === materia.id"
+            class="p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+            <div class="font-medium text-gray-900">{{ materia.nombre }}</div>
+            <div class="text-sm text-gray-500">{{ materia.codigo }} - {{ materia.anio }}° Año</div>
+            <div class="text-xs text-gray-400">{{ getCarreraNombre(materia.carrera_id) }}</div>
+          </div>
+          
+          <div *ngIf="materiasFiltradas.length === 0" class="text-center py-8 text-gray-500">
+            No se encontraron materias
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de Asignaciones -->
+    <div class="lg:col-span-2">
+      <div *ngIf="!materiaSeleccionada" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+        <i class="fas fa-hand-pointer text-4xl text-gray-300 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Selecciona una materia</h3>
+        <p class="text-gray-500">Elige una materia de la lista para gestionar sus asignaciones</p>
+      </div>
+
+      <div *ngIf="materiaSeleccionada" class="space-y-6">
+        <!-- Info de la materia seleccionada -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-2">{{ materiaSeleccionada.nombre }}</h2>
+          <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+            <span><i class="fas fa-code mr-1"></i>{{ materiaSeleccionada.codigo }}</span>
+            <span><i class="fas fa-graduation-cap mr-1"></i>{{ materiaSeleccionada.anio }}° Año</span>
+            <span><i class="fas fa-university mr-1"></i>{{ getCarreraNombre(materiaSeleccionada.carrera_id) }}</span>
+          </div>
+        </div>
+
+        <!-- Tabs para Profesores/Estudiantes -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="border-b border-gray-200">
+            <nav class="flex">
+              <button
+                (click)="cambiarVista('profesores')"
+                [class.bg-blue-50]="vistaActiva === 'profesores'"
+                [class.text-blue-600]="vistaActiva === 'profesores'"
+                [class.border-blue-500]="vistaActiva === 'profesores'"
+                class="px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium">
+                <i class="fas fa-chalkboard-teacher mr-2"></i>
+                Profesores ({{ profesoresAsignados.length }})
+              </button>
+              <button
+                (click)="cambiarVista('estudiantes')"
+                [class.bg-blue-50]="vistaActiva === 'estudiantes'"
+                [class.text-blue-600]="vistaActiva === 'estudiantes'"
+                [class.border-blue-500]="vistaActiva === 'estudiantes'"
+                class="px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium">
+                <i class="fas fa-user-graduate mr-2"></i>
+                Estudiantes ({{ estudiantesAsignados.length }})
+              </button>
+            </nav>
+          </div>
+
+          <div class="p-6">
+            <!-- Vista de Profesores -->
+            <div *ngIf="vistaActiva === 'profesores'">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Gestión de Profesores</h3>
+                <button
+                  (click)="asignacionMasiva()"
+                  [disabled]="profesoresDisponibles.length === 0"
+                  class="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg transition-colors">
+                  <i class="fas fa-users mr-2"></i>
+                  Asignar Todos
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Profesores Disponibles -->
+                <div>
+                  <h4 class="font-medium text-gray-700 mb-3">Profesores Disponibles</h4>
+                  <div 
+                    cdkDropList
+                    id="profesores-disponibles"
+                    #profesoresDisponiblesList="cdkDropList"
+                    [cdkDropListData]="profesoresDisponibles"
+                    [cdkDropListConnectedTo]="[profesoresAsignadosList]"
+                    (cdkDropListDropped)="onDropProfesor($event)"
+                    class="min-h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    
+                    <div 
+                      *ngFor="let profesor of profesoresDisponibles"
+                      cdkDrag
+                      class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 mb-2 cursor-move hover:shadow-md transition-shadow">
+                      <div class="font-medium text-gray-900">{{ profesor.name }}</div>
+                      <div class="text-sm text-gray-500">{{ profesor.email }}</div>
+                      <!-- Especialidad se mostrará cuando esté disponible en el modelo -->
+                    </div>
+                    
+                    <div *ngIf="profesoresDisponibles.length === 0" class="text-center text-gray-500 py-8">
+                      <i class="fas fa-user-slash text-2xl mb-2"></i>
+                      <p>No hay profesores disponibles</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Profesores Asignados -->
+                <div>
+                  <h4 class="font-medium text-gray-700 mb-3">Profesores Asignados</h4>
+                  <div 
+                    cdkDropList
+                    id="profesores-asignados"
+                    #profesoresAsignadosList="cdkDropList"
+                    [cdkDropListData]="profesoresAsignados"
+                    [cdkDropListConnectedTo]="[profesoresDisponiblesList]"
+                    (cdkDropListDropped)="onDropProfesor($event)"
+                    class="min-h-32 bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg p-4">
+                    
+                    <div 
+                      *ngFor="let profesor of profesoresAsignados"
+                      class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 mb-2">
+                      <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                          <div class="font-medium text-gray-900">{{ profesor.name }}</div>
+                          <div class="text-sm text-gray-500">{{ profesor.email }}</div>
+                          <div class="text-xs text-blue-600">{{ profesor.tipo_asignacion | titlecase }}</div>
+                        </div>
+                        <button
+                          (click)="removerProfesor(profesor.id)"
+                          class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-colors"
+                          title="Remover profesor">
+                          <i class="fas fa-times text-sm"></i>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div *ngIf="profesoresAsignados.length === 0" class="text-center text-gray-500 py-8">
+                      <i class="fas fa-user-plus text-2xl mb-2"></i>
+                      <p>Arrastra profesores aquí para asignarlos</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vista de Estudiantes -->
+            <div *ngIf="vistaActiva === 'estudiantes'">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Gestión de Estudiantes</h3>
+                <button
+                  (click)="asignacionMasiva()"
+                  [disabled]="estudiantesDisponibles.length === 0"
+                  class="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg transition-colors">
+                  <i class="fas fa-users mr-2"></i>
+                  Inscribir Todos
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Estudiantes Disponibles -->
+                <div>
+                  <h4 class="font-medium text-gray-700 mb-3">Estudiantes Disponibles</h4>
+                  <div 
+                    cdkDropList
+                    id="estudiantes-disponibles"
+                    #estudiantesDisponiblesList="cdkDropList"
+                    [cdkDropListData]="estudiantesDisponibles"
+                    [cdkDropListConnectedTo]="[estudiantesAsignadosList]"
+                    (cdkDropListDropped)="onDropEstudiante($event)"
+                    class="min-h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    
+                    <div 
+                      *ngFor="let estudiante of estudiantesDisponibles"
+                      cdkDrag
+                      class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 mb-2 cursor-move hover:shadow-md transition-shadow">
+                      <div class="font-medium text-gray-900">{{ estudiante.name }}</div>
+                      <div class="text-sm text-gray-500">{{ estudiante.email }}</div>
+                      <!-- DNI se mostrará cuando esté disponible en el modelo -->
+                    </div>
+                    
+                    <div *ngIf="estudiantesDisponibles.length === 0" class="text-center text-gray-500 py-8">
+                      <i class="fas fa-user-slash text-2xl mb-2"></i>
+                      <p>No hay estudiantes disponibles</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Estudiantes Asignados -->
+                <div>
+                  <h4 class="font-medium text-gray-700 mb-3">Estudiantes Inscritos</h4>
+                  <div 
+                    cdkDropList
+                    id="estudiantes-asignados"
+                    #estudiantesAsignadosList="cdkDropList"
+                    [cdkDropListData]="estudiantesAsignados"
+                    [cdkDropListConnectedTo]="[estudiantesDisponiblesList]"
+                    (cdkDropListDropped)="onDropEstudiante($event)"
+                    class="min-h-32 bg-green-50 border-2 border-dashed border-green-300 rounded-lg p-4">
+                    
+                    <div 
+                      *ngFor="let estudiante of estudiantesAsignados"
+                      class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 mb-2">
+                      <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                          <div class="font-medium text-gray-900">{{ estudiante.name }}</div>
+                          <div class="text-sm text-gray-500">{{ estudiante.email }}</div>
+                          <div class="text-xs text-green-600">{{ estudiante.estado | titlecase }}</div>
+                        </div>
+                        <button
+                          (click)="removerEstudiante(estudiante.id)"
+                          class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-colors"
+                          title="Remover estudiante">
+                          <i class="fas fa-times text-sm"></i>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div *ngIf="estudiantesAsignados.length === 0" class="text-center text-gray-500 py-8">
+                      <i class="fas fa-user-plus text-2xl mb-2"></i>
+                      <p>Arrastra estudiantes aquí para inscribirlos</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div *ngIf="cargandoAsignaciones" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+      <span class="text-gray-700">Cargando asignaciones...</span>
+    </div>
+  </div>
+</div>

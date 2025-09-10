@@ -104,10 +104,31 @@ export const routes: Routes = [
         data: { requiredRoles: ['admin'] }
       },
       {
+        path: 'administracion',
+        children: [
+          {
+            path: 'profesores',
+            loadComponent: () => import('./funcionalidades/administracion/gestion-profesores/gestion-profesores.component').then(c => c.GestionProfesoresComponent),
+            canActivate: [AuthGuard, RoleGuard],
+            data: { requiredRoles: ['admin'] }
+          },
+          {
+            path: 'profesores/registro',
+            loadComponent: () => import('./funcionalidades/administracion/registro-profesor/registro-profesor.component').then(c => c.RegistroProfesorComponent),
+            canActivate: [AuthGuard, RoleGuard],
+            data: { requiredRoles: ['admin'] }
+          },
+          {
+            path: 'asignacion-materias',
+            loadComponent: () => import('./funcionalidades/administracion/asignacion-materias/asignacion-materias.component').then(c => c.AsignacionMateriasComponent),
+            canActivate: [AuthGuard, RoleGuard],
+            data: { requiredRoles: ['admin'] }
+          }
+        ]
+      },
+      {
         path: 'gestion-profesores',
-        loadComponent: () => import('./funcionalidades/administracion/gestion-profesores/gestion-profesores.component').then(c => c.GestionProfesoresComponent),
-        canActivate: [AuthGuard, RoleGuard],
-        data: { requiredRoles: ['admin'] }
+        redirectTo: 'administracion/profesores'
       }
     ]
   },

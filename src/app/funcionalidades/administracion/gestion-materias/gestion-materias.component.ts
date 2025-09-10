@@ -11,94 +11,149 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   template: `
-    <div class="wp-admin-wrapper">
-      <!-- WordPress-style Header -->
-      <div class="wp-header">
-        <div class="wp-header-content">
-          <div class="wp-header-left">
-            <h1 class="wp-title">Gestión de Materias</h1>
-            <p class="wp-subtitle">Administrar el plan de estudios y asignaciones académicas</p>
-          </div>
-          <div class="wp-header-stats">
-            <div class="wp-stat-item">
-              <span class="wp-stat-number">{{ materias.length }}</span>
-              <span class="wp-stat-label">Total Materias</span>
+    <!-- CONTENEDOR PRINCIPAL ESTILO ARGON DASHBOARD -->
+    <div class="min-h-screen bg-gray-50 p-4">
+      <div class="max-w-7xl mx-auto">
+        
+        <!-- HEADER LIMPIO ESTILO ARGON -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Gestión de Materias</h1>
+              <p class="text-gray-600 mt-1">Administra el plan de estudios y asignaciones académicas del instituto</p>
             </div>
-            <div class="wp-stat-item">
-              <span class="wp-stat-number">{{ getMateriasActivas() }}</span>
-              <span class="wp-stat-label">Activas</span>
+            <div class="flex items-center space-x-3">
+              <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-100 text-blue-800">
+                <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                {{ materias.length }} Materias
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="wp-admin-content">
-        <!-- WordPress-style Dashboard Widgets -->
-        <div class="wp-dashboard-widgets">
-          <div class="wp-widget">
-            <div class="wp-widget-header">
-              <h3>Resumen de Materias</h3>
+        <!-- TARJETAS DE ESTADÍSTICAS ESTILO ARGON -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+          
+          <!-- Tarjeta: Total Materias -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">TOTAL MATERIAS</p>
+                <div class="mt-2">
+                  <div class="text-3xl font-bold text-gray-900">{{ materias.length }}</div>
+                </div>
+                <div class="mt-2 flex items-center text-sm">
+                  <span class="text-green-600 font-medium">↗ 3%</span>
+                  <span class="text-gray-500 ml-2">vs mes anterior</span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                  </svg>
+                </div>
+              </div>
             </div>
-            <div class="wp-widget-content">
-              <div class="wp-stats-grid">
-                <div class="wp-stat-box">
-                  <div class="wp-stat-icon">📚</div>
-                  <div class="wp-stat-info">
-                    <span class="wp-stat-value">{{ materias.length }}</span>
-                    <span class="wp-stat-text">Total de Materias</span>
-                  </div>
+          </div>
+
+          <!-- Tarjeta: Materias Activas -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">MATERIAS ACTIVAS</p>
+                <div class="mt-2">
+                  <div class="text-3xl font-bold text-gray-900">{{ getMateriasActivas() }}</div>
                 </div>
-                <div class="wp-stat-box">
-                  <div class="wp-stat-icon">✅</div>
-                  <div class="wp-stat-info">
-                    <span class="wp-stat-value">{{ getMateriasActivas() }}</span>
-                    <span class="wp-stat-text">Materias Activas</span>
-                  </div>
+                <div class="mt-2 flex items-center text-sm">
+                  <span class="text-green-600 font-medium">↗ 2%</span>
+                  <span class="text-gray-500 ml-2">materias en curso</span>
                 </div>
-                <div class="wp-stat-box">
-                  <div class="wp-stat-icon">⏸️</div>
-                  <div class="wp-stat-info">
-                    <span class="wp-stat-value">{{ materias.length - getMateriasActivas() }}</span>
-                    <span class="wp-stat-text">Materias Inactivas</span>
-                  </div>
+              </div>
+              <div class="ml-4">
+                <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
                 </div>
-                <div class="wp-stat-box">
-                  <div class="wp-stat-icon">👨‍🏫</div>
-                  <div class="wp-stat-info">
-                    <span class="wp-stat-value">{{ getMateriasConProfesor() }}</span>
-                    <span class="wp-stat-text">Con Profesor Asignado</span>
-                  </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjeta: Materias Inactivas -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">MATERIAS INACTIVAS</p>
+                <div class="mt-2">
+                  <div class="text-3xl font-bold text-gray-900">{{ materias.length - getMateriasActivas() }}</div>
+                </div>
+                <div class="mt-2 flex items-center text-sm">
+                  <span class="text-red-600 font-medium">↘ 1%</span>
+                  <span class="text-gray-500 ml-2">materias pausadas</span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjeta: Con Profesor -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">CON PROFESOR</p>
+                <div class="mt-2">
+                  <div class="text-3xl font-bold text-gray-900">{{ getMateriasConProfesor() }}</div>
+                </div>
+                <div class="mt-2 flex items-center text-sm">
+                  <span class="text-blue-600 font-medium">→ 0%</span>
+                  <span class="text-gray-500 ml-2">materias asignadas</span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- WordPress-style Filters -->
-        <div class="wp-widget">
-          <div class="wp-widget-header">
-            <h3>Filtros de Búsqueda</h3>
+        <!-- PANEL DE FILTROS ESTILO ARGON -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Filtros de Búsqueda</h2>
+            <p class="text-sm text-gray-600 mt-1">Busca y filtra materias por carrera, año y texto</p>
           </div>
-          <div class="wp-widget-content">
-            <div class="wp-filters-grid">
-              <div class="wp-filter-group">
-                <label class="wp-label">Carrera</label>
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Carrera</label>
                 <select 
                   [(ngModel)]="filtroCarrera"
                   (ngModelChange)="aplicarFiltros()"
-                  class="wp-select">
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                   <option value="">Todas las carreras</option>
                   <option *ngFor="let carrera of carreras" [value]="carrera.id">
                     {{ carrera.nombre }}
                   </option>
                 </select>
               </div>
-              <div class="wp-filter-group">
-                <label class="wp-label">Año</label>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Año</label>
                 <select 
                   [(ngModel)]="filtroAnio"
                   (ngModelChange)="aplicarFiltros()"
-                  class="wp-select">
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                   <option value="">Todos los años</option>
                   <option value="1">1er Año</option>
                   <option value="2">2do Año</option>
@@ -108,20 +163,30 @@ import Swal from 'sweetalert2';
                   <option value="6">6to Año</option>
                 </select>
               </div>
-              <div class="wp-filter-group">
-                <label class="wp-label">Búsqueda rápida</label>
-                <input 
-                  type="text" 
-                  [(ngModel)]="busquedaTexto"
-                  (ngModelChange)="aplicarFiltros()"
-                  placeholder="Buscar por nombre o código..."
-                  class="wp-input">
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Búsqueda Rápida</label>
+                <div class="relative">
+                  <input 
+                    type="text" 
+                    [(ngModel)]="busquedaTexto"
+                    (ngModelChange)="aplicarFiltros()"
+                    placeholder="Buscar por nombre o código..."
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                </div>
               </div>
-              <div class="wp-filter-group">
-                <label class="wp-label">&nbsp;</label>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
                 <button 
                   (click)="limpiarFiltros()"
-                  class="wp-button wp-button-secondary">
+                  class="w-full flex items-center justify-center px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
                   Limpiar Filtros
                 </button>
               </div>
@@ -129,15 +194,24 @@ import Swal from 'sweetalert2';
           </div>
         </div>
 
-        <!-- WordPress-style Form -->
-        <div class="wp-widget" [ngClass]="{'wp-widget-expanded': mostrarFormulario}">
-          <div class="wp-widget-header" (click)="toggleFormulario()">
-            <h3>{{ editandoMateria ? 'Editar Materia' : 'Nueva Materia' }}</h3>
-            <button type="button" class="wp-toggle-button">
-              {{ mostrarFormulario ? '−' : '+' }}
-            </button>
+        <!-- FORMULARIO ESTILO ARGON -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6" [ngClass]="{'ring-2 ring-blue-500': mostrarFormulario}">
+          <div class="px-6 py-4 border-b border-gray-200 cursor-pointer" (click)="toggleFormulario()">
+            <div class="flex justify-between items-center">
+              <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                {{ editandoMateria ? 'Editar Materia' : 'Nueva Materia' }}
+              </h3>
+              <button type="button" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5 transform transition-transform duration-200" [ngClass]="{'rotate-45': mostrarFormulario}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+              </button>
+            </div>
           </div>
-          <div class="wp-widget-content" *ngIf="mostrarFormulario">
+          <div class="p-6" *ngIf="mostrarFormulario">
             <form [formGroup]="formulario" (ngSubmit)="guardarMateria()" class="wp-form">
               <div class="wp-form-row">
                 <div class="wp-form-group">
@@ -279,75 +353,121 @@ import Swal from 'sweetalert2';
           </div>
         </div>
 
-        <!-- WordPress-style Table -->
-        <div class="wp-widget">
-          <div class="wp-widget-header">
-            <h3>Materias Registradas ({{ materiasFiltradas.length }})</h3>
+        <!-- TABLA DE MATERIAS ESTILO ARGON -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+              <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+              Materias Registradas ({{ materiasFiltradas.length }})
+            </h2>
+            <p class="text-sm text-gray-600 mt-1">Lista completa de materias del instituto</p>
           </div>
-          <div class="wp-widget-content">
-            <div *ngIf="cargandoMaterias" class="wp-loading">
-              <div class="wp-spinner"></div>
-              <p>Cargando materias...</p>
+          <div class="p-6">
+
+            <!-- Loading State -->
+            <div *ngIf="cargandoMaterias" class="flex justify-center items-center py-12">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+              <p class="ml-4 text-gray-600">Cargando materias...</p>
             </div>
 
-            <div *ngIf="!cargandoMaterias && materiasFiltradas.length === 0" class="wp-empty-state">
-              <p>No hay materias registradas</p>
+            <!-- Empty State -->
+            <div *ngIf="!cargandoMaterias && materiasFiltradas.length === 0" class="text-center py-12">
+              <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <h3 class="mt-4 text-lg font-bold text-gray-900">No hay materias registradas</h3>
+              <p class="mt-2 text-sm text-gray-500">Comienza creando tu primera materia</p>
             </div>
 
-            <div *ngIf="!cargandoMaterias && materiasFiltradas.length > 0" class="wp-table-container">
-              <table class="wp-table">
-                <thead>
+            <!-- TABLA ESTILO ARGON -->
+            <div *ngIf="!cargandoMaterias && materiasFiltradas.length > 0" class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                   <tr>
-                    <th><input type="checkbox" class="wp-checkbox"></th>
-                    <th>Materia</th>
-                    <th>Carrera</th>
-                    <th>Año</th>
-                    <th>Profesor</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Materia
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Carrera
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Año
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Profesor
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Estado
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Acciones
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr *ngFor="let materia of materiasFiltradas" class="wp-table-row">
-                    <td><input type="checkbox" class="wp-checkbox"></td>
-                    <td>
-                      <div class="wp-table-title">
-                        <strong>{{ materia.nombre }}</strong>
-                        <div class="wp-table-subtitle">{{ materia.codigo }}</div>
-                        <div *ngIf="materia.descripcion" class="wp-table-description">
-                          {{ materia.descripcion }}
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr *ngFor="let materia of materiasFiltradas" class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10">
+                          <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium text-sm">
+                            {{ materia.nombre.charAt(0).toUpperCase() }}
+                          </div>
+                        </div>
+                        <div class="ml-4">
+                          <div class="text-sm font-medium text-gray-900">
+                            {{ materia.nombre }}
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            {{ materia.codigo }}
+                          </div>
+                          <div *ngIf="materia.descripcion" class="text-xs text-gray-400 mt-1 max-w-xs truncate">
+                            {{ materia.descripcion }}
+                          </div>
                         </div>
                       </div>
                     </td>
-                    <td>{{ materia.carrera_nombre }}</td>
-                    <td>{{ materia.anio }}° Año - {{ getCuatrimestreLabel(materia.cuatrimestre) }}</td>
-                    <td>
-                      <span [ngClass]="{'wp-text-muted': !materia.profesor_nombre}">
-                        {{ materia.profesor_nombre || 'Sin asignar' }}
-                      </span>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ materia.carrera_nombre }}
+                      </div>
                     </td>
-                    <td>
-                      <span class="wp-badge" 
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">
+                        {{ materia.anio }}° Año
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        {{ getCuatrimestreLabel(materia.cuatrimestre) }}
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">
+                        {{ materia.profesor_nombre || 'Sin asignar' }}
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                             [ngClass]="{
-                              'wp-badge-success': materia.estado === 'activa',
-                              'wp-badge-error': materia.estado === 'inactiva'
+                              'bg-green-100 text-green-800': materia.estado === 'activa',
+                              'bg-red-100 text-red-800': materia.estado === 'inactiva'
                             }">
                         {{ materia.estado }}
                       </span>
                     </td>
-                    <td>
-                      <div class="wp-table-actions">
-                        <button 
-                          (click)="editarMateria(materia)"
-                          class="wp-action-button wp-action-edit"
-                          title="Editar">
-                          Editar
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div class="flex space-x-3">
+                        <button (click)="editarMateria(materia)"
+                                class="text-blue-600 hover:text-blue-900">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                          </svg>
                         </button>
-                        <button 
-                          (click)="eliminarMateria(materia)"
-                          class="wp-action-button wp-action-delete"
-                          title="Eliminar">
-                          Eliminar
+                        <button (click)="eliminarMateria(materia)"
+                                class="text-red-600 hover:text-red-900">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
                         </button>
                       </div>
                     </td>
@@ -355,242 +475,36 @@ import Swal from 'sweetalert2';
                 </tbody>
               </table>
             </div>
+
+            <!-- Paginación simple -->
+            <div *ngIf="!cargandoMaterias && materiasFiltradas.length > 0" class="flex items-center justify-between mt-6">
+              <div class="text-sm text-gray-700">
+                Mostrando {{ materiasFiltradas.length }} de {{ materias.length }} materias
+              </div>
+              <div class="flex space-x-2">
+                <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
+                  Anterior
+                </button>
+                <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
+                  Siguiente
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- WordPress-style CSS -->
     <style>
-      .wp-admin-wrapper {
-        min-height: 100vh;
-        background: #f1f1f1;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      .animate-spin {
+        animation: spin 1s linear infinite;
       }
-
-      .wp-header {
-        background: #23282d;
-        color: white;
-        padding: 0;
-        box-shadow: 0 1px 1px rgba(0,0,0,.04);
+      
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
       }
-
-      .wp-header-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .wp-header-left h1.wp-title {
-        margin: 0;
-        font-size: 23px;
-        font-weight: 400;
-        line-height: 1.3;
-      }
-
-      .wp-header-left .wp-subtitle {
-        margin: 5px 0 0 0;
-        font-size: 13px;
-        color: #b4b9be;
-      }
-
-      .wp-header-stats {
-        display: flex;
-        gap: 15px;
-      }
-
-      .wp-stat-item {
-        text-align: center;
-      }
-
-      .wp-stat-number {
-        display: block;
-        font-size: 18px;
-        font-weight: 600;
-        color: #0073aa;
-      }
-
-      .wp-stat-label {
-        display: block;
-        font-size: 11px;
-        color: #b4b9be;
-        text-transform: uppercase;
-      }
-
-      .wp-admin-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      .wp-dashboard-widgets {
-        margin-bottom: 20px;
-      }
-
-      .wp-widget {
-        background: white;
-        border: 1px solid #c3c4c7;
-        box-shadow: 0 1px 1px rgba(0,0,0,.04);
-        margin-bottom: 20px;
-      }
-
-      .wp-widget-header {
-        background: #f6f7f7;
-        border-bottom: 1px solid #c3c4c7;
-        padding: 12px 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-      }
-
-      .wp-widget-header h3 {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 600;
-        color: #23282d;
-      }
-
-      .wp-toggle-button {
-        background: none;
-        border: none;
-        font-size: 16px;
-        color: #646970;
-        cursor: pointer;
-        padding: 0;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .wp-widget-content {
-        padding: 15px;
-      }
-
-      .wp-stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-      }
-
-      .wp-stat-box {
-        display: flex;
-        align-items: center;
-        padding: 15px;
-        background: #f9f9f9;
-        border-left: 4px solid #0073aa;
-        border-radius: 3px;
-      }
-
-      .wp-stat-icon {
-        font-size: 24px;
-        margin-right: 15px;
-      }
-
-      .wp-stat-value {
-        display: block;
-        font-size: 24px;
-        font-weight: 600;
-        color: #23282d;
-        line-height: 1;
-      }
-
-      .wp-stat-text {
-        display: block;
-        font-size: 13px;
-        color: #646970;
-        margin-top: 2px;
-      }
-
-      .wp-filters-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        align-items: end;
-      }
-
-      .wp-filter-group {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .wp-label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #23282d;
-        margin-bottom: 5px;
-        display: block;
-      }
-
-      .wp-input, .wp-select, .wp-textarea {
-        width: 100%;
-        padding: 6px 8px;
-        border: 1px solid #8c8f94;
-        border-radius: 3px;
-        font-size: 13px;
-        line-height: 1.4;
-        background: white;
-      }
-
-      .wp-input:focus, .wp-select:focus, .wp-textarea:focus {
-        border-color: #0073aa;
-        box-shadow: 0 0 0 1px #0073aa;
-        outline: none;
-      }
-
-      .wp-input-error {
-        border-color: #d63638;
-      }
-
-      .wp-error-message {
-        color: #d63638;
-        font-size: 12px;
-        margin-top: 3px;
-      }
-
-      .wp-button {
-        display: inline-block;
-        text-decoration: none;
-        font-size: 13px;
-        line-height: 2.15384615;
-        min-height: 30px;
-        margin: 0;
-        padding: 0 10px;
-        cursor: pointer;
-        border-width: 1px;
-        border-style: solid;
-        border-radius: 3px;
-        white-space: nowrap;
-        box-sizing: border-box;
-      }
-
-      .wp-button-primary {
-        background: #0073aa;
-        border-color: #0073aa;
-        color: white;
-      }
-
-      .wp-button-primary:hover {
-        background: #005a87;
-        border-color: #005a87;
-      }
-
-      .wp-button-secondary {
-        background: #f6f7f7;
-        border-color: #c3c4c7;
-        color: #0073aa;
-      }
-
-      .wp-button-secondary:hover {
-        background: #f0f0f1;
-        border-color: #8c8f94;
-      }
-
+      
       .wp-form {
         max-width: none;
       }
@@ -615,13 +529,91 @@ import Swal from 'sweetalert2';
         grid-column: 1 / -1;
       }
 
+      .wp-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #23282d;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .wp-input, .wp-select, .wp-textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        line-height: 1.4;
+        background: white;
+        transition: all 0.2s;
+      }
+
+      .wp-input:focus, .wp-select:focus, .wp-textarea:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        outline: none;
+      }
+
+      .wp-input-error {
+        border-color: #ef4444;
+      }
+
+      .wp-error-message {
+        color: #ef4444;
+        font-size: 12px;
+        margin-top: 3px;
+      }
+
+      .wp-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        min-height: 40px;
+        margin: 0;
+        padding: 0 16px;
+        cursor: pointer;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 8px;
+        white-space: nowrap;
+        box-sizing: border-box;
+        transition: all 0.2s;
+      }
+
+      .wp-button-primary {
+        background: linear-gradient(to right, #6366f1, #8b5cf6);
+        border-color: transparent;
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      .wp-button-primary:hover {
+        background: linear-gradient(to right, #4f46e5, #7c3aed);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+
+      .wp-button-secondary {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        color: #374151;
+      }
+
+      .wp-button-secondary:hover {
+        background: #e5e7eb;
+        border-color: #9ca3af;
+      }
+
       .wp-form-actions {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         justify-content: flex-end;
-        margin-top: 20px;
-        padding-top: 15px;
-        border-top: 1px solid #c3c4c7;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #e5e7eb;
       }
 
       .wp-spinner {
@@ -629,162 +621,15 @@ import Swal from 'sweetalert2';
         width: 16px;
         height: 16px;
         border: 2px solid #f3f3f3;
-        border-top: 2px solid #0073aa;
+        border-top: 2px solid #6366f1;
         border-radius: 50%;
-        animation: wp-spin 1s linear infinite;
+        animation: spin 1s linear infinite;
         margin-right: 8px;
-      }
-
-      @keyframes wp-spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-
-      .wp-loading {
-        text-align: center;
-        padding: 40px 20px;
-        color: #646970;
-      }
-
-      .wp-empty-state {
-        text-align: center;
-        padding: 40px 20px;
-        color: #646970;
-      }
-
-      .wp-table-container {
-        overflow-x: auto;
-      }
-
-      .wp-table {
-        width: 100%;
-        border-collapse: collapse;
-        background: white;
-      }
-
-      .wp-table th {
-        background: #f6f7f7;
-        border-bottom: 1px solid #c3c4c7;
-        padding: 8px 10px;
-        text-align: left;
-        font-size: 13px;
-        font-weight: 600;
-        color: #23282d;
-      }
-
-      .wp-table td {
-        padding: 10px;
-        border-bottom: 1px solid #c3c4c7;
-        font-size: 13px;
-        vertical-align: top;
-      }
-
-      .wp-table-row:hover {
-        background: #f6f7f7;
-      }
-
-      .wp-table-title strong {
-        font-weight: 600;
-        color: #0073aa;
-      }
-
-      .wp-table-subtitle {
-        font-size: 12px;
-        color: #646970;
-        margin-top: 2px;
-      }
-
-      .wp-table-description {
-        font-size: 12px;
-        color: #646970;
-        margin-top: 4px;
-        max-width: 200px;
-      }
-
-      .wp-checkbox {
-        margin: 0;
-      }
-
-      .wp-badge {
-        display: inline-block;
-        padding: 2px 8px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        border-radius: 3px;
-      }
-
-      .wp-badge-success {
-        background: #00a32a;
-        color: white;
-      }
-
-      .wp-badge-error {
-        background: #d63638;
-        color: white;
-      }
-
-      .wp-text-muted {
-        color: #646970;
-      }
-
-      .wp-table-actions {
-        display: flex;
-        gap: 5px;
-      }
-
-      .wp-action-button {
-        font-size: 12px;
-        padding: 2px 6px;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-        text-decoration: none;
-      }
-
-      .wp-action-edit {
-        background: #0073aa;
-        color: white;
-      }
-
-      .wp-action-edit:hover {
-        background: #005a87;
-      }
-
-      .wp-action-delete {
-        background: #d63638;
-        color: white;
-      }
-
-      .wp-action-delete:hover {
-        background: #b32d2e;
       }
 
       /* Responsive */
       @media (max-width: 768px) {
-        .wp-header-content {
-          flex-direction: column;
-          gap: 10px;
-          text-align: center;
-        }
-        
-        .wp-header-stats {
-          justify-content: center;
-        }
-        
-        .wp-admin-content {
-          padding: 15px;
-        }
-        
         .wp-form-row, .wp-form-row-3 {
-          grid-template-columns: 1fr;
-        }
-        
-        .wp-filters-grid {
-          grid-template-columns: 1fr;
-        }
-        
-        .wp-stats-grid {
           grid-template-columns: 1fr;
         }
       }
@@ -857,6 +702,7 @@ export class GestionMateriasComponent implements OnInit {
     this.cargandoMaterias = true;
     this.materiasService.getMaterias().subscribe({
       next: (materias) => {
+        console.log('Materias cargadas:', materias);
         this.materias = materias;
         this.aplicarFiltros();
         this.cargandoMaterias = false;
@@ -901,12 +747,17 @@ export class GestionMateriasComponent implements OnInit {
       : this.materiasService.crearMateria(datosMateria);
 
     operacion.subscribe({
-      next: () => {
+      next: (response) => {
         const mensaje = this.editandoMateria ? 'actualizada' : 'creada';
         Swal.fire('¡Éxito!', `Materia ${mensaje} correctamente`, 'success');
+        
+        // Recargar tanto materias como profesores para asegurar datos actualizados
         this.cargarMaterias();
+        this.cargarProfesores();
         this.resetFormulario();
         this.cargando = false;
+        
+        console.log('Materia guardada exitosamente:', response);
       },
       error: (error) => {
         console.error('Error al guardar materia:', error);

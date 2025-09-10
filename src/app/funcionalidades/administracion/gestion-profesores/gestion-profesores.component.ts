@@ -11,6 +11,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ProfesoresService, Profesor } from '../../../nucleo/servicios/profesores.service';
 import { MateriasService, Materia } from '../../../nucleo/servicios/materias.service';
 
@@ -19,207 +20,322 @@ import { MateriasService, Materia } from '../../../nucleo/servicios/materias.ser
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="container mx-auto p-6">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Gestión de Profesores</h1>
-        <p class="text-gray-600">Administra los profesores del sistema académico</p>
-      </div>
+    <!-- CONTENEDOR PRINCIPAL ESTILO ARGON DASHBOARD -->
+    <div class="min-h-screen bg-gray-50 p-4">
+      <div class="max-w-7xl mx-auto">
+        
+        <!-- HEADER LIMPIO ESTILO ARGON -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Gestión de Profesores</h1>
+              <p class="text-gray-600 mt-1">Administra la información de los profesores del instituto</p>
+            </div>
+            <div class="flex items-center space-x-3">
+              <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-green-100 text-green-800">
+                <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                {{ profesores.length }} Profesores
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- TARJETAS DE ESTADÍSTICAS ESTILO ARGON -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6" *ngIf="!loading && !error">
+          
+          <!-- Tarjeta: Total Profesores -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">TOTAL PROFESORES</p>
+                <div class="mt-2">
+                  <div class="text-3xl font-bold text-gray-900">{{ profesores.length }}</div>
+                </div>
+                <div class="mt-2 flex items-center text-sm">
+                  <span class="text-green-600 font-medium">↗ 3%</span>
+                  <span class="text-gray-500 ml-2">vs mes anterior</span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjeta: Con Especialidad -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">CON ESPECIALIDAD</p>
+                <div class="mt-2">
+                  <div class="text-3xl font-bold text-gray-900">{{ profesoresConEspecialidad }}</div>
+                </div>
+                <div class="mt-2 flex items-center text-sm">
+                  <span class="text-green-600 font-medium">↗ 2%</span>
+                  <span class="text-gray-500 ml-2">especializados</span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjeta: Departamentos -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">DEPARTAMENTOS</p>
+                <div class="mt-2">
+                  <div class="text-3xl font-bold text-gray-900">{{ departamentosUnicos }}</div>
+                </div>
+                <div class="mt-2 flex items-center text-sm">
+                  <span class="text-blue-600 font-medium">→ 0%</span>
+                  <span class="text-gray-500 ml-2">áreas académicas</span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjeta: Activos -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">ACTIVOS</p>
+                <div class="mt-2">
+                  <div class="text-3xl font-bold text-gray-900">{{ profesores.length }}</div>
+                </div>
+                <div class="mt-2 flex items-center text-sm">
+                  <span class="text-green-600 font-medium">↗ 6%</span>
+                  <span class="text-gray-500 ml-2">profesores activos</span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
       <!-- Loading State -->
       <div *ngIf="loading" class="flex justify-center items-center py-12">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
 
-      <!-- Error State -->
-      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">Error</h3>
-            <p class="text-sm text-red-700 mt-1">{{ error }}</p>
+        <!-- Error State -->
+        <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 shadow-lg">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-bold text-red-800">Error</h3>
+              <p class="text-sm text-red-700 mt-1">{{ error }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" *ngIf="!loading && !error">
-        <div class="bg-white rounded-lg shadow p-6">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+
+        <!-- PANEL DE FILTROS ESTILO ARGON -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6" *ngIf="!loading && !error">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900">Lista de Profesores</h2>
+                <p class="text-sm text-gray-600 mt-1">Busca y filtra profesores por especialidad y departamento</p>
+              </div>
+              <button 
+                (click)="navegarARegistro()"
+                class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
+                Nuevo Profesor
+              </button>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Buscar Profesor</label>
+                <div class="relative">
+                  <input 
+                    type="text" 
+                    [(ngModel)]="searchTerm"
+                    (input)="filtrarProfesores()"
+                    placeholder="Buscar por nombre o email..."
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                </div>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Especialidad</label>
+                <select 
+                  [(ngModel)]="filtroEspecialidad"
+                  (change)="filtrarProfesores()"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <option value="">Todas las especialidades</option>
+                  <option *ngFor="let esp of especialidadesUnicas" [value]="esp">{{ esp }}</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Filtrar por Departamento</label>
+                <select 
+                  [(ngModel)]="filtroDepartamento"
+                  (change)="filtrarProfesores()"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <option value="">Todos los departamentos</option>
+                  <option *ngFor="let dept of departamentosUnicosArray" [value]="dept">{{ dept }}</option>
+                </select>
               </div>
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Total Profesores</p>
-              <p class="text-2xl font-semibold text-gray-900">{{ profesores.length }}</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-6">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            
+            <div class="flex justify-end">
+              <button 
+                (click)="limpiarFiltros()" 
+                class="flex items-center px-4 py-2 border border-gray-200 rounded-lg">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
-              </div>
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Con Especialidad</p>
-              <p class="text-2xl font-semibold text-gray-900">{{ profesoresConEspecialidad }}</p>
+                Limpiar Filtros
+              </button>
             </div>
           </div>
-        </div>
 
-        <div class="bg-white rounded-lg shadow p-6">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                </svg>
-              </div>
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Departamentos</p>
-              <p class="text-2xl font-semibold text-gray-900">{{ departamentosUnicos }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Search and Filters -->
-      <div class="bg-white rounded-lg shadow mb-6 p-6" *ngIf="!loading && !error">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Buscar profesor</label>
-            <input
-              type="text"
-              id="search"
-              [(ngModel)]="searchTerm"
-              (input)="filtrarProfesores()"
-              placeholder="Nombre o email..."
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-          </div>
-          
-          <div>
-            <label for="especialidad" class="block text-sm font-medium text-gray-700 mb-2">Especialidad</label>
-            <select
-              id="especialidad"
-              [(ngModel)]="filtroEspecialidad"
-              (change)="filtrarProfesores()"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Todas las especialidades</option>
-              <option *ngFor="let esp of especialidadesUnicas" [value]="esp">{{ esp }}</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="departamento" class="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
-            <select
-              id="departamento"
-              [(ngModel)]="filtroDepartamento"
-              (change)="filtrarProfesores()"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Todos los departamentos</option>
-              <option *ngFor="let dept of departamentosUnicosArray" [value]="dept">{{ dept }}</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Professors List -->
-      <div class="bg-white rounded-lg shadow overflow-hidden" *ngIf="!loading && !error">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900">
-            Lista de Profesores ({{ profesoresFiltrados.length }})
-          </h2>
-        </div>
-
-        <!-- Empty State -->
-        <div *ngIf="profesoresFiltrados.length === 0" class="text-center py-12">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">No hay profesores</h3>
-          <p class="mt-1 text-sm text-gray-500">
-            {{ searchTerm || filtroEspecialidad || filtroDepartamento ? 'No se encontraron profesores con los filtros aplicados.' : 'No hay profesores registrados en el sistema.' }}
-          </p>
-        </div>
-
-        <!-- Professors Table -->
-        <div *ngIf="profesoresFiltrados.length > 0" class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profesor</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Especialidad</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registro</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let profesor of profesoresFiltrados" class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10">
-                      <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <span class="text-sm font-medium text-blue-600">
+          <!-- TABLA ESTILO ARGON -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Profesor
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Contacto
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Especialidad
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Departamento
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Registro
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let profesor of profesoresFiltrados" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium text-sm">
                           {{ getInitials(profesor.name) }}
-                        </span>
+                        </div>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">
+                          {{ profesor.name }}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          ID: {{ profesor.id }}
+                        </div>
                       </div>
                     </div>
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">{{ profesor.name }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ profesor.email }}</div>
+                    <div class="text-sm text-gray-500">{{ profesor.telefono || 'No especificado' }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      {{ profesor.especialidad || 'Sin especialidad' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {{ profesor.departamento || 'Sin departamento' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ formatDate(profesor.created_at) }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex space-x-3">
+                      <button 
+                        (click)="editarProfesor(profesor)" 
+                        class="text-blue-600 hover:text-blue-900">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                      </button>
+                      <button 
+                        (click)="eliminarProfesor(profesor.id)" 
+                        class="text-red-600 hover:text-red-900">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                      </button>
                     </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ profesor.email }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span *ngIf="profesor.especialidad" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                    {{ profesor.especialidad }}
-                  </span>
-                  <span *ngIf="!profesor.especialidad" class="text-sm text-gray-400">Sin especialidad</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ profesor.departamento || 'Sin departamento' }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ formatDate(profesor.created_at) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
-                    (click)="verDetalleProfesor(profesor)"
-                    class="text-blue-600 hover:text-blue-900 mr-3"
-                  >
-                    Ver detalles
-                  </button>
-                  <button
-                    (click)="verMateriasProfesor(profesor)"
-                    class="text-green-600 hover:text-green-900"
-                  >
-                    Ver materias
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="profesoresFiltrados.length === 0" class="text-center py-12">
+            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <h3 class="mt-4 text-lg font-bold text-gray-900">No hay profesores</h3>
+            <p class="mt-2 text-sm text-gray-500">
+              {{ searchTerm || filtroEspecialidad || filtroDepartamento ? 'No se encontraron profesores con los filtros aplicados.' : 'No hay profesores registrados en el sistema.' }}
+            </p>
+          </div>
+
+          <!-- Paginación simple -->
+          <div class="flex items-center justify-between mt-6 px-6 pb-6">
+            <div class="text-sm text-gray-700">
+              Mostrando {{ profesoresFiltrados.length }} de {{ profesores.length }} profesores
+            </div>
+            <div class="flex space-x-2">
+              <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
+                Anterior
+              </button>
+              <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50">
+                Siguiente
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -327,6 +443,7 @@ import { MateriasService, Materia } from '../../../nucleo/servicios/materias.ser
 export class GestionProfesoresComponent implements OnInit {
   private profesoresService = inject(ProfesoresService);
   private materiasService = inject(MateriasService);
+  private router = inject(Router);
 
   // State management
   loading = true;
@@ -390,49 +507,18 @@ export class GestionProfesoresComponent implements OnInit {
   }
 
   /**
-   * Muestra el modal con los detalles del profesor
+   * Limpia todos los filtros aplicados
    */
-  async verDetalleProfesor(profesor: Profesor) {
-    this.profesorSeleccionado = profesor;
-    await this.cargarMateriasProfesor(profesor.id);
+  limpiarFiltros() {
+    this.searchTerm = '';
+    this.filtroEspecialidad = '';
+    this.filtroDepartamento = '';
+    this.filtrarProfesores();
   }
 
-  /**
-   * Carga las materias asignadas a un profesor específico
-   */
-  async verMateriasProfesor(profesor: Profesor) {
-    await this.verDetalleProfesor(profesor);
-  }
 
   /**
-   * Carga las materias del profesor seleccionado
-   */
-  private cargarMateriasProfesor(profesorId: string) {
-    return new Promise<void>((resolve) => {
-      this.profesoresService.getMateriasByProfesor(profesorId).subscribe({
-        next: (materias) => {
-          this.materiasProfesor = materias;
-          resolve();
-        },
-        error: (error) => {
-          console.error('Error al cargar materias del profesor:', error);
-          this.materiasProfesor = [];
-          resolve();
-        }
-      });
-    });
-  }
-
-  /**
-   * Cierra el modal de detalles
-   */
-  cerrarModal() {
-    this.profesorSeleccionado = null;
-    this.materiasProfesor = [];
-  }
-
-  /**
-   * Obtiene las iniciales de un nombre
+   * Obtiene las iniciales del nombre de un profesor
    */
   getInitials(name: string): string {
     return name
@@ -447,12 +533,65 @@ export class GestionProfesoresComponent implements OnInit {
    * Formatea una fecha para mostrar
    */
   formatDate(dateString: string): string {
+    if (!dateString) return 'No disponible';
+    
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-AR', {
+    return date.toLocaleDateString('es-ES', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric'
     });
+  }
+
+  /**
+   * Edita un profesor
+   */
+  editarProfesor(profesor: Profesor) {
+    console.log('Editando profesor:', profesor);
+    // TODO: Implementar modal de edición
+  }
+
+  /**
+   * Elimina un profesor
+   */
+  eliminarProfesor(profesorId: string | number) {
+    if (confirm('¿Está seguro de que desea eliminar este profesor?')) {
+      console.log('Eliminando profesor:', profesorId);
+      // TODO: Implementar método deleteProfesor en el servicio
+      this.error = 'Funcionalidad de eliminación no implementada aún';
+    }
+  }
+
+  /**
+   * Ver detalles del profesor
+   */
+  verDetalleProfesor(profesor: Profesor) {
+    this.profesorSeleccionado = profesor;
+    this.cargarMateriasProfesor(profesor.id);
+  }
+
+  /**
+   * Ver materias del profesor
+   */
+  verMateriasProfesor(profesor: Profesor) {
+    this.verDetalleProfesor(profesor);
+  }
+
+  /**
+   * Carga las materias de un profesor
+   */
+  cargarMateriasProfesor(profesorId: string | number) {
+    // TODO: Implementar método getMateriasByProfesor en MateriasService
+    console.log('Cargando materias para profesor:', profesorId);
+    this.materiasProfesor = [];
+  }
+
+  /**
+   * Cierra el modal
+   */
+  cerrarModal() {
+    this.profesorSeleccionado = null;
+    this.materiasProfesor = [];
   }
 
   // Computed properties para estadísticas
@@ -485,5 +624,13 @@ export class GestionProfesoresComponent implements OnInit {
         .map(p => p.departamento!)
     );
     return Array.from(departamentos).sort();
+  }
+
+  /**
+   * Navega al componente de registro de profesor
+   * Lint ID: 73c61ce0-8492-4dae-855a-4a3a7ff8f667
+   */
+  navegarARegistro(): void {
+    this.router.navigate(['/dashboard/administracion/profesores/registro']);
   }
 }

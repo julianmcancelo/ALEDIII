@@ -154,4 +154,14 @@ export class UserService {
   eliminarUsuario(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+
+  /**
+   * @method getUsersByRole
+   * @description Obtiene usuarios filtrados por rol
+   * @param role Rol de los usuarios a obtener ('admin', 'profesor', 'student')
+   * @returns Observable con la lista de usuarios del rol especificado
+   */
+  getUsersByRole(role: string): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}?role=${role}`);
+  }
 }

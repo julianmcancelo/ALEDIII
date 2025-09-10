@@ -20,6 +20,7 @@ require_once 'controllers/NewsletterController.php';
 require_once 'controllers/CarrerasController.php';
 require_once 'controllers/MateriasController.php';
 require_once 'controllers/ProfesoresController.php';
+require_once 'controllers/AsignacionesController.php';
 
 // Obtener la ruta solicitada
 $request_uri = $_SERVER['REQUEST_URI'];
@@ -27,9 +28,75 @@ $path = parse_url($request_uri, PHP_URL_PATH);
 $path = str_replace('/api', '', $path); // Remover /api del path
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Debug logging
+error_log("API Router - Request URI: " . $request_uri);
+error_log("API Router - Processed path: " . $path);
+error_log("API Router - Method: " . $method);
+
 // Router simple
 try {
     switch (true) {
+        // Rutas de asignaciones (mover al principio para evitar conflictos)
+        case ($path === '/asignaciones' || preg_match('/^\/asignaciones$/', $path)) && $method === 'GET':
+            error_log("AsignacionesRouter - GET request matched, path: " . $path);
+            $controller = new AsignacionesController();
+            if (isset($_GET['materia_id'])) {
+                if (isset($_GET['tipo']) && $_GET['tipo'] === 'profesores') {
+                    error_log("AsignacionesRouter - Getting profesores for materia: " . $_GET['materia_id']);
+                    echo json_encode($controller->getProfesoresByMateria($_GET['materia_id']));
+                } elseif (isset($_GET['tipo']) && $_GET['tipo'] === 'estudiantes') {
+                    error_log("AsignacionesRouter - Getting estudiantes for materia: " . $_GET['materia_id']);
+                    echo json_encode($controller->getEstudiantesByMateria($_GET['materia_id']));
+                } else {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Tipo de consulta requerido (profesores/estudiantes)']);
+                }
+            } else {
+                http_response_code(400);
+                echo json_encode(['error' => 'Materia ID requerido']);
+            }
+            break;
+
+        case preg_match('/^\/asignaciones\/profesor$/', $path) && $method === 'POST':
+            error_log("AsignacionesRouter - POST profesor request matched, path: " . $path);
+            $controller = new AsignacionesController();
+            $result = $controller->asignarProfesor();
+            error_log("AsignacionesRouter - POST profesor result: " . json_encode($result));
+            echo json_encode($result);
+            break;
+
+        case preg_match('/^\/asignaciones\/estudiante$/', $path) && $method === 'POST':
+            error_log("AsignacionesRouter - POST estudiante request matched, path: " . $path);
+            $controller = new AsignacionesController();
+            $result = $controller->asignarEstudiante();
+            error_log("AsignacionesRouter - POST estudiante result: " . json_encode($result));
+            echo json_encode($result);
+            break;
+
+        case preg_match('/^\/asignaciones\/profesor\/bulk$/', $path) && $method === 'POST':
+            error_log("AsignacionesRouter - POST profesor bulk request matched, path: " . $path);
+            $controller = new AsignacionesController();
+            echo json_encode($controller->asignacionMasivaProfesores());
+            break;
+
+        case preg_match('/^\/asignaciones\/estudiante\/bulk$/', $path) && $method === 'POST':
+            error_log("AsignacionesRouter - POST estudiante bulk request matched, path: " . $path);
+            $controller = new AsignacionesController();
+            echo json_encode($controller->asignacionMasivaEstudiantes());
+            break;
+
+        case preg_match('/^\/asignaciones\/profesor$/', $path) && $method === 'DELETE':
+            error_log("AsignacionesRouter - DELETE profesor request matched, path: " . $path);
+            $controller = new AsignacionesController();
+            echo json_encode($controller->removerProfesor());
+            break;
+
+        case preg_match('/^\/asignaciones\/estudiante$/', $path) && $method === 'DELETE':
+            error_log("AsignacionesRouter - DELETE estudiante request matched, path: " . $path);
+            $controller = new AsignacionesController();
+            echo json_encode($controller->removerEstudiante());
+            break;
+
         // Rutas de autenticación
         case preg_match('/^\/users\/login$/', $path) && $method === 'POST':
             $controller = new AuthController();
@@ -158,6 +225,7 @@ try {
             $controller = new NewsletterController();
             $controller->subscribe();
             break;
+
 
         default:
             http_response_code(404);
