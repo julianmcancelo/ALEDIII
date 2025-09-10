@@ -134,6 +134,7 @@ import Swal from 'sweetalert2';
     <!-- Modal para crear usuario -->
     <app-modal-crear-usuario
       *ngIf="mostrarModal"
+      [mostrar]="mostrarModal"
       [tipoUsuario]="tipoUsuarioSeleccionado"
       (cerrarModal)="cerrarModal()"
       (usuarioCreado)="onUsuarioCreado($event)">

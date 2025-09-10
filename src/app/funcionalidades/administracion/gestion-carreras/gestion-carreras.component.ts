@@ -4,51 +4,143 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { CarrerasService, Carrera, CrearCarreraRequest } from '../../../nucleo/servicios/carreras.service';
 import Swal from 'sweetalert2';
 
+// Angular Material Imports
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatRippleModule } from '@angular/material/core';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatMenuModule } from '@angular/material/menu';
+
 @Component({
   selector: 'app-gestion-carreras',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatTableModule,
+    MatChipsModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatToolbarModule,
+    MatDividerModule,
+    MatTooltipModule,
+    MatSnackBarModule,
+    MatDialogModule,
+    MatBadgeModule,
+    MatRippleModule,
+    MatExpansionModule,
+    MatMenuModule
+  ],
   template: `
-    <div class="p-6">
-      <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <div class="bg-white rounded-lg shadow-lg mb-6">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-2xl font-bold text-gray-800">Gestión de Carreras</h2>
-            <p class="text-gray-600 mt-1">Administrar carreras del Instituto Beltrán</p>
+    <div class="wp-admin-wrapper">
+      <!-- WordPress-style Header -->
+      <div class="wp-header">
+        <div class="wp-header-content">
+          <div class="wp-header-left">
+            <h1 class="wp-title">Gestión de Carreras</h1>
+            <p class="wp-subtitle">Administrar carreras académicas del instituto</p>
+          </div>
+          <div class="wp-header-stats">
+            <div class="wp-stat-item">
+              <span class="wp-stat-number">{{ carreras.length }}</span>
+              <span class="wp-stat-label">Total Carreras</span>
+            </div>
+            <div class="wp-stat-item">
+              <span class="wp-stat-number">{{ getCarrerasActivas() }}</span>
+              <span class="wp-stat-label">Activas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wp-admin-content">
+        <!-- WordPress-style Dashboard Widgets -->
+        <div class="wp-dashboard-widgets">
+          <div class="wp-widget">
+            <div class="wp-widget-header">
+              <h3>Resumen de Carreras</h3>
+            </div>
+            <div class="wp-widget-content">
+              <div class="wp-stats-grid">
+                <div class="wp-stat-box">
+                  <div class="wp-stat-icon">🎓</div>
+                  <div class="wp-stat-info">
+                    <span class="wp-stat-value">{{ carreras.length }}</span>
+                    <span class="wp-stat-text">Total de Carreras</span>
+                  </div>
+                </div>
+                <div class="wp-stat-box">
+                  <div class="wp-stat-icon">✅</div>
+                  <div class="wp-stat-info">
+                    <span class="wp-stat-value">{{ getCarrerasActivas() }}</span>
+                    <span class="wp-stat-text">Carreras Activas</span>
+                  </div>
+                </div>
+                <div class="wp-stat-box">
+                  <div class="wp-stat-icon">⏸️</div>
+                  <div class="wp-stat-info">
+                    <span class="wp-stat-value">{{ carreras.length - getCarrerasActivas() }}</span>
+                    <span class="wp-stat-text">Carreras Inactivas</span>
+                  </div>
+                </div>
+                <div class="wp-stat-box">
+                  <div class="wp-stat-icon">📊</div>
+                  <div class="wp-stat-info">
+                    <span class="wp-stat-value">{{ getPromedioDuracion() }}</span>
+                    <span class="wp-stat-text">Promedio Duración</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Formulario para crear/editar carrera -->
-        <div class="bg-white rounded-lg shadow-lg mb-6">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">
-              {{ editandoCarrera ? 'Editar Carrera' : 'Nueva Carrera' }}
-            </h3>
+        <!-- WordPress-style Form -->
+        <div class="wp-widget" [ngClass]="{'wp-widget-expanded': mostrarFormulario}">
+          <div class="wp-widget-header" (click)="toggleFormulario()">
+            <h3>{{ editandoCarrera ? 'Editar Carrera' : 'Nueva Carrera' }}</h3>
+            <button type="button" class="wp-toggle-button">
+              {{ mostrarFormulario ? '−' : '+' }}
+            </button>
           </div>
-          
-          <div class="p-6">
-            <form [formGroup]="formulario" (ngSubmit)="guardarCarrera()" class="space-y-4">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de la Carrera *</label>
+          <div class="wp-widget-content" *ngIf="mostrarFormulario">
+            <form [formGroup]="formulario" (ngSubmit)="guardarCarrera()" class="wp-form">
+              <div class="wp-form-row">
+                <div class="wp-form-group">
+                  <label class="wp-label">Nombre de la Carrera *</label>
                   <input 
                     type="text" 
                     formControlName="nombre" 
-                    placeholder="Técnico en Informática"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    [class.border-red-500]="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched">
+                    placeholder="Ej: Técnico Superior en Informática"
+                    class="wp-input"
+                    [class.wp-input-error]="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched">
                   <div *ngIf="formulario.get('nombre')?.hasError('required') && formulario.get('nombre')?.touched" 
-                       class="mt-1 text-sm text-red-600">
+                       class="wp-error-message">
                     El nombre es requerido
                   </div>
                 </div>
                 
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Duración (años) *</label>
-                  <select 
-                    formControlName="duracion_anios"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <div class="wp-form-group">
+                  <label class="wp-label">Duración (años) *</label>
+                  <select formControlName="duracion_anios" class="wp-select">
                     <option value="1">1 año</option>
                     <option value="2">2 años</option>
                     <option value="3">3 años</option>
@@ -59,39 +151,41 @@ import Swal from 'sweetalert2';
                 </div>
               </div>
               
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-                <textarea 
-                  formControlName="descripcion" 
-                  rows="3"
-                  placeholder="Descripción de la carrera..."
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </textarea>
+              <div class="wp-form-row">
+                <div class="wp-form-group wp-form-group-full">
+                  <label class="wp-label">Descripción</label>
+                  <textarea 
+                    formControlName="descripcion" 
+                    rows="3"
+                    placeholder="Descripción de la carrera..."
+                    class="wp-textarea">
+                  </textarea>
+                </div>
               </div>
               
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                <select 
-                  formControlName="estado"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                  <option value="activa">Activa</option>
-                  <option value="inactiva">Inactiva</option>
-                </select>
+              <div class="wp-form-row">
+                <div class="wp-form-group">
+                  <label class="wp-label">Estado</label>
+                  <select formControlName="estado" class="wp-select">
+                    <option value="activa">Activa</option>
+                    <option value="inactiva">Inactiva</option>
+                  </select>
+                </div>
               </div>
               
-              <div class="flex justify-end space-x-3">
+              <div class="wp-form-actions">
                 <button 
                   *ngIf="editandoCarrera"
                   type="button"
                   (click)="cancelarEdicion()"
-                  class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                  class="wp-button wp-button-secondary">
                   Cancelar
                 </button>
                 <button 
                   type="submit"
                   [disabled]="formulario.invalid || cargando"
-                  class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                  <span *ngIf="cargando" class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                  class="wp-button wp-button-primary">
+                  <span *ngIf="cargando" class="wp-spinner"></span>
                   {{ editandoCarrera ? 'Actualizar' : 'Crear' }} Carrera
                 </button>
               </div>
@@ -99,64 +193,486 @@ import Swal from 'sweetalert2';
           </div>
         </div>
 
-        <!-- Lista de carreras -->
-        <div class="bg-white rounded-lg shadow-lg">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Carreras Registradas</h3>
+        <!-- WordPress-style Table -->
+        <div class="wp-widget">
+          <div class="wp-widget-header">
+            <h3>Carreras Registradas ({{ carreras.length }})</h3>
           </div>
-          
-          <div class="p-6">
-            <div *ngIf="cargandoCarreras" class="text-center py-8">
-              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              <p class="mt-2 text-gray-600">Cargando carreras...</p>
+          <div class="wp-widget-content">
+            <div *ngIf="cargandoCarreras" class="wp-loading">
+              <div class="wp-spinner"></div>
+              <p>Cargando carreras...</p>
             </div>
 
-            <div *ngIf="!cargandoCarreras && carreras.length === 0" class="text-center py-8 text-gray-500">
-              No hay carreras registradas
+            <div *ngIf="!cargandoCarreras && carreras.length === 0" class="wp-empty-state">
+              <p>No hay carreras registradas</p>
             </div>
 
-            <div *ngIf="!cargandoCarreras && carreras.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div *ngFor="let carrera of carreras" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <div class="flex justify-between items-start mb-3">
-                  <div class="flex-1">
-                    <h4 class="font-semibold text-gray-800 text-lg">{{ carrera.nombre }}</h4>
-                    <p class="text-sm text-gray-600 mt-1">{{ carrera.duracion_anios }} años de duración</p>
-                  </div>
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                        [ngClass]="{
-                          'bg-green-100 text-green-800': carrera.estado === 'activa',
-                          'bg-red-100 text-red-800': carrera.estado === 'inactiva'
-                        }">
-                    {{ carrera.estado }}
-                  </span>
-                </div>
-                
-                <p *ngIf="carrera.descripcion" class="text-sm text-gray-600 mb-4">
-                  {{ carrera.descripcion }}
-                </p>
-                
-                <div class="flex justify-end space-x-2">
-                  <button 
-                    (click)="editarCarrera(carrera)"
-                    class="text-blue-600 hover:text-blue-800 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                  </button>
-                  <button 
-                    (click)="eliminarCarrera(carrera)"
-                    class="text-red-600 hover:text-red-800 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
+            <div *ngIf="!cargandoCarreras && carreras.length > 0" class="wp-table-container">
+              <table class="wp-table">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" class="wp-checkbox"></th>
+                    <th>Carrera</th>
+                    <th>Duración</th>
+                    <th>Estado</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let carrera of carreras" class="wp-table-row">
+                    <td><input type="checkbox" class="wp-checkbox"></td>
+                    <td>
+                      <div class="wp-table-title">
+                        <strong>{{ carrera.nombre }}</strong>
+                        <div class="wp-table-subtitle">{{ carrera.duracion_anios }} años de duración</div>
+                      </div>
+                    </td>
+                    <td>{{ carrera.duracion_anios }} años</td>
+                    <td>
+                      <span class="wp-badge" 
+                            [ngClass]="{
+                              'wp-badge-success': carrera.estado === 'activa',
+                              'wp-badge-error': carrera.estado === 'inactiva'
+                            }">
+                        {{ carrera.estado }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="wp-table-description">
+                        {{ carrera.descripcion || 'Sin descripción' }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="wp-table-actions">
+                        <button 
+                          (click)="editarCarrera(carrera)"
+                          class="wp-action-button wp-action-edit"
+                          title="Editar">
+                          Editar
+                        </button>
+                        <button 
+                          (click)="eliminarCarrera(carrera)"
+                          class="wp-action-button wp-action-delete"
+                          title="Eliminar">
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- WordPress-style CSS -->
+    <style>
+      .wp-admin-wrapper {
+        min-height: 100vh;
+        background: #f1f1f1;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      }
+
+      .wp-header {
+        background: #23282d;
+        color: white;
+        padding: 0;
+        box-shadow: 0 1px 1px rgba(0,0,0,.04);
+      }
+
+      .wp-header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .wp-header-left h1.wp-title {
+        margin: 0;
+        font-size: 23px;
+        font-weight: 400;
+        line-height: 1.3;
+      }
+
+      .wp-header-left .wp-subtitle {
+        margin: 5px 0 0 0;
+        font-size: 13px;
+        color: #b4b9be;
+      }
+
+      .wp-header-stats {
+        display: flex;
+        gap: 15px;
+      }
+
+      .wp-stat-item {
+        text-align: center;
+      }
+
+      .wp-stat-number {
+        display: block;
+        font-size: 18px;
+        font-weight: 600;
+        color: #0073aa;
+      }
+
+      .wp-stat-label {
+        display: block;
+        font-size: 11px;
+        color: #b4b9be;
+        text-transform: uppercase;
+      }
+
+      .wp-admin-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .wp-dashboard-widgets {
+        margin-bottom: 20px;
+      }
+
+      .wp-widget {
+        background: white;
+        border: 1px solid #c3c4c7;
+        box-shadow: 0 1px 1px rgba(0,0,0,.04);
+        margin-bottom: 20px;
+      }
+
+      .wp-widget-header {
+        background: #f6f7f7;
+        border-bottom: 1px solid #c3c4c7;
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .wp-widget-header h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #23282d;
+      }
+
+      .wp-toggle-button {
+        background: none;
+        border: none;
+        font-size: 16px;
+        color: #646970;
+        cursor: pointer;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .wp-widget-content {
+        padding: 15px;
+      }
+
+      .wp-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .wp-stat-box {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: #f9f9f9;
+        border-left: 4px solid #0073aa;
+        border-radius: 3px;
+      }
+
+      .wp-stat-icon {
+        font-size: 24px;
+        margin-right: 15px;
+      }
+
+      .wp-stat-value {
+        display: block;
+        font-size: 24px;
+        font-weight: 600;
+        color: #23282d;
+        line-height: 1;
+      }
+
+      .wp-stat-text {
+        display: block;
+        font-size: 13px;
+        color: #646970;
+        margin-top: 2px;
+      }
+
+      .wp-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #23282d;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .wp-input, .wp-select, .wp-textarea {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #8c8f94;
+        border-radius: 3px;
+        font-size: 13px;
+        line-height: 1.4;
+        background: white;
+      }
+
+      .wp-input:focus, .wp-select:focus, .wp-textarea:focus {
+        border-color: #0073aa;
+        box-shadow: 0 0 0 1px #0073aa;
+        outline: none;
+      }
+
+      .wp-input-error {
+        border-color: #d63638;
+      }
+
+      .wp-error-message {
+        color: #d63638;
+        font-size: 12px;
+        margin-top: 3px;
+      }
+
+      .wp-button {
+        display: inline-block;
+        text-decoration: none;
+        font-size: 13px;
+        line-height: 2.15384615;
+        min-height: 30px;
+        margin: 0;
+        padding: 0 10px;
+        cursor: pointer;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 3px;
+        white-space: nowrap;
+        box-sizing: border-box;
+      }
+
+      .wp-button-primary {
+        background: #0073aa;
+        border-color: #0073aa;
+        color: white;
+      }
+
+      .wp-button-primary:hover {
+        background: #005a87;
+        border-color: #005a87;
+      }
+
+      .wp-button-secondary {
+        background: #f6f7f7;
+        border-color: #c3c4c7;
+        color: #0073aa;
+      }
+
+      .wp-button-secondary:hover {
+        background: #f0f0f1;
+        border-color: #8c8f94;
+      }
+
+      .wp-form {
+        max-width: none;
+      }
+
+      .wp-form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .wp-form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .wp-form-group-full {
+        grid-column: 1 / -1;
+      }
+
+      .wp-form-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #c3c4c7;
+      }
+
+      .wp-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #0073aa;
+        border-radius: 50%;
+        animation: wp-spin 1s linear infinite;
+        margin-right: 8px;
+      }
+
+      @keyframes wp-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .wp-loading {
+        text-align: center;
+        padding: 40px 20px;
+        color: #646970;
+      }
+
+      .wp-empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #646970;
+      }
+
+      .wp-table-container {
+        overflow-x: auto;
+      }
+
+      .wp-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+
+      .wp-table th {
+        background: #f6f7f7;
+        border-bottom: 1px solid #c3c4c7;
+        padding: 8px 10px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+        color: #23282d;
+      }
+
+      .wp-table td {
+        padding: 10px;
+        border-bottom: 1px solid #c3c4c7;
+        font-size: 13px;
+        vertical-align: top;
+      }
+
+      .wp-table-row:hover {
+        background: #f6f7f7;
+      }
+
+      .wp-table-title strong {
+        font-weight: 600;
+        color: #0073aa;
+      }
+
+      .wp-table-subtitle {
+        font-size: 12px;
+        color: #646970;
+        margin-top: 2px;
+      }
+
+      .wp-table-description {
+        font-size: 12px;
+        color: #646970;
+        max-width: 200px;
+      }
+
+      .wp-checkbox {
+        margin: 0;
+      }
+
+      .wp-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        border-radius: 3px;
+      }
+
+      .wp-badge-success {
+        background: #00a32a;
+        color: white;
+      }
+
+      .wp-badge-error {
+        background: #d63638;
+        color: white;
+      }
+
+      .wp-table-actions {
+        display: flex;
+        gap: 5px;
+      }
+
+      .wp-action-button {
+        font-size: 12px;
+        padding: 2px 6px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .wp-action-edit {
+        background: #0073aa;
+        color: white;
+      }
+
+      .wp-action-edit:hover {
+        background: #005a87;
+      }
+
+      .wp-action-delete {
+        background: #d63638;
+        color: white;
+      }
+
+      .wp-action-delete:hover {
+        background: #b32d2e;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .wp-header-content {
+          flex-direction: column;
+          gap: 10px;
+          text-align: center;
+        }
+        
+        .wp-header-stats {
+          justify-content: center;
+        }
+        
+        .wp-admin-content {
+          padding: 15px;
+        }
+        
+        .wp-form-row {
+          grid-template-columns: 1fr;
+        }
+        
+        .wp-stats-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
   `
 })
 export class GestionCarrerasComponent implements OnInit {
@@ -165,6 +681,9 @@ export class GestionCarrerasComponent implements OnInit {
   cargandoCarreras = false;
   cargando = false;
   editandoCarrera: Carrera | null = null;
+  mostrarFormulario = true;
+  
+  displayedColumns: string[] = ['nombre', 'duracion', 'estado', 'descripcion', 'acciones'];
 
   private carrerasService = inject(CarrerasService);
   private fb = inject(FormBuilder);
@@ -267,6 +786,23 @@ export class GestionCarrerasComponent implements OnInit {
         });
       }
     });
+  }
+
+  getCarrerasActivas(): number {
+    return this.carreras.filter(carrera => carrera.estado === 'activa').length;
+  }
+
+  getPromedioDuracion(): number {
+    if (this.carreras.length === 0) return 0;
+    const suma = this.carreras.reduce((acc, carrera) => acc + Number(carrera.duracion_anios), 0);
+    return Math.round((suma / this.carreras.length) * 10) / 10;
+  }
+
+  toggleFormulario(): void {
+    this.mostrarFormulario = !this.mostrarFormulario;
+    if (!this.mostrarFormulario && this.editandoCarrera) {
+      this.cancelarEdicion();
+    }
   }
 
   private resetFormulario(): void {

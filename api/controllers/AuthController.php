@@ -95,7 +95,7 @@ class AuthController {
             try {
                 $stmt = $this->db->prepare("INSERT INTO usuarios (
                     id, email, name, apellidos, role, password_hash, 
-                    dni, legajo, carrera_id, telefono, departamento,
+                    dni, legajo, carrera_id, telefono, departamento, especialidad,
                     fechaNacimiento, fechaInscripcion, estado, 
                     calle, ciudad, provincia, codigoPostal,
                     contacto_emergencia_nombre, contacto_emergencia_telefono, contacto_emergencia_parentesco
@@ -113,6 +113,7 @@ class AuthController {
                     $input['carrera_id'] ?? null,
                     $input['telefono'] ?? null,
                     $input['departamento'] ?? null,
+                    $input['especialidad'] ?? null,
                     $input['fechaNacimiento'] ?? null,
                     $input['fechaInscripcion'] ?? null,
                     $input['estado'] ?? 'activo',

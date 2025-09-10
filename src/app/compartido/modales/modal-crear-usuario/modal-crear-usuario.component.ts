@@ -630,7 +630,8 @@ export class ModalCrearUsuarioComponent implements OnInit, OnChanges {
       contacto_emergencia_telefono: this.formulario.get('contacto_emergencia_telefono')?.value || null,
       contacto_emergencia_parentesco: this.formulario.get('contacto_emergencia_parentesco')?.value || null,
       telefono: this.formulario.get('telefono')?.value || null,
-      departamento: this.formulario.get('departamento')?.value || null
+      departamento: this.formulario.get('departamento')?.value || null,
+      especialidad: this.formulario.get('especialidad')?.value || null
     };
 
     this.userService.crearUsuario(datosUsuario).subscribe({

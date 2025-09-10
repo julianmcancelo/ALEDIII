@@ -60,6 +60,7 @@ export interface CrearUsuarioRequest {
   contacto_emergencia_telefono?: string;
   contacto_emergencia_parentesco?: string;
   departamento?: string;
+  especialidad?: string;
 }
 
 export interface UpdateUserRequest {
